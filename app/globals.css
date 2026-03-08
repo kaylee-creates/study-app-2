@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cozy-cream: #fdf8f3;
+  --cozy-paper: #f5f0e8;
+  --cozy-grid: #e8e2d9;
+  --cozy-sage: #9caa8a;
+  --cozy-clover: #7a9b76;
+  --cozy-terracotta: #c17f59;
+  --cozy-gingham: #e84a5f;
+  --cozy-ink: #2c2c2c;
+}
+
+body {
+  @apply bg-cozy-cream text-cozy-ink antialiased;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Scrapbook grid paper background */
+.scrapbook-page {
+  background-size: 20px 20px;
+  background-image: linear-gradient(to right, rgb(232 226 217 / 0.5) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(232 226 217 / 0.5) 1px, transparent 1px);
+}
+
+/* Washi-tape style borders */
+.washi-tape {
+  box-shadow: inset 0 0 0 3px var(--cozy-sage), 0 2px 4px rgb(0 0 0 / 0.06);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
