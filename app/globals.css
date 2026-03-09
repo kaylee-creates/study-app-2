@@ -5,8 +5,8 @@
 /* ===== Original theme (default, free) ===== */
 :root,
 [data-theme="original"] {
-  --color-bg: #fdf5f0;
-  --color-surface: #fff7f2;
+  --color-bg: #ffffff;
+  --color-surface: #fefefe;
   --color-accent: #f2a7b0;
   --color-accent-dark: #d4808a;
   --color-text: #2c2c2c;
@@ -15,9 +15,9 @@
   --color-shadow: rgba(242, 167, 176, 0.12);
   --color-shadow-light: rgba(242, 167, 176, 0.07);
   --color-shadow-lighter: rgba(242, 167, 176, 0.03);
-  --color-plane-1: #f8c8d4;
-  --color-plane-2: #f5e6a3;
-  --color-plane-3: #c5e6c0;
+  --color-plane-1: #f2b5b0;
+  --color-plane-2: #ecd57e;
+  --color-plane-3: #b8d4a8;
   --color-overlay-pink: rgba(242, 167, 176, 0.4);
 }
 

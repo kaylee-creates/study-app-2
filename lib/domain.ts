@@ -74,6 +74,7 @@ export interface ScrapbookItem {
   width: number;
   height: number;
   zIndex: number;
+  rotation?: number;
   relatedEntityId?: string;
   createdAt: string;
 }

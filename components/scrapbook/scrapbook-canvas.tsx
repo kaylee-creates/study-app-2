@@ -101,6 +101,26 @@ export function ScrapbookCanvas({ pageId, children }: ScrapbookCanvasProps) {
     [items, persistItems]
   );
 
+  const handleResize = useCallback(
+    (id: string, width: number, height: number) => {
+      const next = items.map((i) =>
+        i.id === id ? { ...i, width, height } : i
+      );
+      persistItems(next);
+    },
+    [items, persistItems]
+  );
+
+  const handleRotate = useCallback(
+    (id: string, rotation: number) => {
+      const next = items.map((i) =>
+        i.id === id ? { ...i, rotation } : i
+      );
+      persistItems(next);
+    },
+    [items, persistItems]
+  );
+
   return (
     <div className="relative min-h-[70vh]">
       <div className="scrapbook-page rounded-xl min-h-[60vh] p-6 relative">
@@ -116,6 +136,8 @@ export function ScrapbookCanvas({ pageId, children }: ScrapbookCanvasProps) {
               onMoveEnd={handleMoveEnd}
               onRemove={handleRemove}
               onBringForward={handleBringForward}
+              onResize={handleResize}
+              onRotate={handleRotate}
             />
           ))}
       </div>
@@ -131,8 +153,8 @@ export function ScrapbookCanvas({ pageId, children }: ScrapbookCanvasProps) {
             <span>Add PNG / image</span>
           </Button>
         </label>
-        <span className="text-xs text-cozy-muted">
-          Drag to rearrange on the page
+        <span className="text-xs text-theme-text-muted">
+          Drag, resize, or rotate items on the page
         </span>
       </div>
     </div>

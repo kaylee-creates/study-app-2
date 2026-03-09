@@ -16,7 +16,7 @@ const defaultSettings: PomodoroSettings = {
 };
 
 const defaultUserSettings: UserSettings = {
-  totalPoints: 0,
+  totalPoints: 1000,
   activeThemeId: "original",
   purchasedThemeIds: ["original"],
   darkModeEnabled: false,
