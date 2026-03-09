@@ -10,26 +10,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cozy: {
-          cream: "#fdf8f3",
-          paper: "#f5f0e8",
-          grid: "#e8e2d9",
-          sage: "#9caa8a",
-          clover: "#7a9b76",
-          terracotta: "#c17f59",
-          gingham: "#e84a5f",
-          ink: "#2c2c2c",
-          muted: "#6b6b6b",
+        theme: {
+          bg: "var(--color-bg)",
+          surface: "var(--color-surface)",
+          accent: "var(--color-accent)",
+          "accent-dark": "var(--color-accent-dark)",
+          text: "var(--color-text)",
+          "text-muted": "var(--color-text-muted)",
+          "nav-glass": "var(--color-nav-glass)",
         },
       },
       fontFamily: {
-        handwritten: ["var(--font-caveat)", "cursive"],
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        cursive: ["var(--font-cursive)", "cursive"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
-      backgroundImage: {
-        "grid-paper":
-          "linear-gradient(to right, rgb(232 226 217 / 0.4) 1px, transparent 1px), linear-gradient(to bottom, rgb(232 226 217 / 0.4) 1px, transparent 1px)",
-        "gingham-pattern": "repeating-conic-gradient(#fdf8f3 0% 25%, #f5f0e8 25% 50%) 50% / 12px 12px",
+      boxShadow: {
+        glass:
+          "0 2px 8px var(--color-shadow), 0 4px 16px var(--color-shadow-light), 0 8px 32px var(--color-shadow-lighter)",
+        "glass-up":
+          "0 -2px 8px var(--color-shadow), 0 -4px 16px var(--color-shadow-light), 0 -8px 32px var(--color-shadow-lighter)",
       },
     },
   },

@@ -1,12 +1,8 @@
 import type {
   StudyState,
-  StudyTrack,
-  Note,
-  Flashcard,
-  PomodoroSession,
-  PlanItem,
-  ScrapbookItem,
   PomodoroSettings,
+  ScrapbookItem,
+  UserSettings,
 } from "./domain";
 import type { StudyRepository } from "./repositories";
 
@@ -17,6 +13,15 @@ const defaultSettings: PomodoroSettings = {
   shortBreakMinutes: 5,
   longBreakMinutes: 15,
   pointsPerFocusMinute: 2,
+};
+
+const defaultUserSettings: UserSettings = {
+  totalPoints: 0,
+  activeThemeId: "original",
+  purchasedThemeIds: ["original"],
+  darkModeEnabled: false,
+  backgroundMusicEnabled: true,
+  displayName: "",
 };
 
 function getStoredState(): StudyState {
@@ -42,6 +47,8 @@ function getDefaultState(): StudyState {
     planItems: [],
     scrapbookItems: [],
     pomodoroSettings: defaultSettings,
+    studyGuides: [],
+    userSettings: defaultUserSettings,
   };
 }
 
@@ -54,6 +61,11 @@ function mergeWithDefaults(partial: Partial<StudyState>): StudyState {
     planItems: partial.planItems ?? [],
     scrapbookItems: partial.scrapbookItems ?? [],
     pomodoroSettings: partial.pomodoroSettings ?? defaultSettings,
+    studyGuides: partial.studyGuides ?? [],
+    userSettings: {
+      ...defaultUserSettings,
+      ...(partial.userSettings ?? {}),
+    },
   };
 }
 
@@ -85,6 +97,10 @@ export const localStudyRepository: StudyRepository = {
       planItems: partial.planItems ?? current.planItems,
       scrapbookItems: partial.scrapbookItems ?? current.scrapbookItems,
       pomodoroSettings: partial.pomodoroSettings ?? current.pomodoroSettings,
+      studyGuides: partial.studyGuides ?? current.studyGuides,
+      userSettings: partial.userSettings
+        ? { ...current.userSettings, ...partial.userSettings }
+        : current.userSettings,
     };
     persist(next);
   },
@@ -117,6 +133,14 @@ export const localStudyRepository: StudyRepository = {
   async getPomodoroSettings() {
     const s = getStoredState().pomodoroSettings;
     return { ...defaultSettings, ...s };
+  },
+
+  async getStudyGuides() {
+    return getStoredState().studyGuides;
+  },
+
+  async getUserSettings() {
+    return getStoredState().userSettings;
   },
 
   async saveScrapbookItems(pageId: string, items: ScrapbookItem[]) {

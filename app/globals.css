@@ -2,32 +2,310 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --cozy-cream: #fdf8f3;
-  --cozy-paper: #f5f0e8;
-  --cozy-grid: #e8e2d9;
-  --cozy-sage: #9caa8a;
-  --cozy-clover: #7a9b76;
-  --cozy-terracotta: #c17f59;
-  --cozy-gingham: #e84a5f;
-  --cozy-ink: #2c2c2c;
+/* ===== Original theme (default, free) ===== */
+:root,
+[data-theme="original"] {
+  --color-bg: #fdf5f0;
+  --color-surface: #fff7f2;
+  --color-accent: #f2a7b0;
+  --color-accent-dark: #d4808a;
+  --color-text: #2c2c2c;
+  --color-text-muted: #6b6b6b;
+  --color-nav-glass: rgba(242, 167, 176, 0.18);
+  --color-shadow: rgba(242, 167, 176, 0.12);
+  --color-shadow-light: rgba(242, 167, 176, 0.07);
+  --color-shadow-lighter: rgba(242, 167, 176, 0.03);
+  --color-plane-1: #f8c8d4;
+  --color-plane-2: #f5e6a3;
+  --color-plane-3: #c5e6c0;
+  --color-overlay-pink: rgba(242, 167, 176, 0.4);
 }
 
+[data-theme="original"].dark {
+  --color-bg: #1a1216;
+  --color-surface: #261a1f;
+  --color-text: #f0e6e8;
+  --color-text-muted: #a89a9d;
+  --color-nav-glass: rgba(242, 167, 176, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #3d2028;
+  --color-plane-2: #3d3620;
+  --color-plane-3: #1e3d1a;
+  --color-overlay-pink: rgba(242, 167, 176, 0.25);
+}
+
+/* ===== Berry (40 coins) ===== */
+[data-theme="berry"] {
+  --color-bg: #f9dbbd;
+  --color-surface: #ffeadd;
+  --color-accent: #da627d;
+  --color-accent-dark: #a53860;
+  --color-text: #450920;
+  --color-text-muted: #6b2a3d;
+  --color-nav-glass: rgba(218, 98, 125, 0.18);
+  --color-shadow: rgba(218, 98, 125, 0.12);
+  --color-shadow-light: rgba(218, 98, 125, 0.07);
+  --color-shadow-lighter: rgba(218, 98, 125, 0.03);
+  --color-plane-1: #ffa5ab;
+  --color-plane-2: #da627d;
+  --color-plane-3: #a53860;
+  --color-overlay-pink: rgba(218, 98, 125, 0.4);
+}
+
+[data-theme="berry"].dark {
+  --color-bg: #1a0710;
+  --color-surface: #2d0f1c;
+  --color-text: #f9dbbd;
+  --color-text-muted: #c9a090;
+  --color-nav-glass: rgba(218, 98, 125, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #4d1a28;
+  --color-plane-2: #3d1020;
+  --color-plane-3: #2d0a18;
+  --color-overlay-pink: rgba(218, 98, 125, 0.25);
+}
+
+/* ===== Ice Cream Sundae (80 coins) ===== */
+[data-theme="icecream"] {
+  --color-bg: #efcfe3;
+  --color-surface: #f8e0f0;
+  --color-accent: #e27396;
+  --color-accent-dark: #eb9ab2;
+  --color-text: #3a2030;
+  --color-text-muted: #6b4a5a;
+  --color-nav-glass: rgba(226, 115, 150, 0.18);
+  --color-shadow: rgba(226, 115, 150, 0.12);
+  --color-shadow-light: rgba(226, 115, 150, 0.07);
+  --color-shadow-lighter: rgba(226, 115, 150, 0.03);
+  --color-plane-1: #ecf2d8;
+  --color-plane-2: #b3dee2;
+  --color-plane-3: #eb9ab2;
+  --color-overlay-pink: rgba(226, 115, 150, 0.4);
+}
+
+[data-theme="icecream"].dark {
+  --color-bg: #1a0f16;
+  --color-surface: #2a1a24;
+  --color-text: #efcfe3;
+  --color-text-muted: #b09aaa;
+  --color-nav-glass: rgba(226, 115, 150, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #2a3020;
+  --color-plane-2: #1a2a2c;
+  --color-plane-3: #3a1a28;
+  --color-overlay-pink: rgba(226, 115, 150, 0.25);
+}
+
+/* ===== Ocean (160 coins) ===== */
+[data-theme="ocean"] {
+  --color-bg: #caf0f8;
+  --color-surface: #e0f7fc;
+  --color-accent: #48cae4;
+  --color-accent-dark: #0077b6;
+  --color-text: #03045e;
+  --color-text-muted: #1a3a6a;
+  --color-nav-glass: rgba(72, 202, 228, 0.18);
+  --color-shadow: rgba(72, 202, 228, 0.12);
+  --color-shadow-light: rgba(72, 202, 228, 0.07);
+  --color-shadow-lighter: rgba(72, 202, 228, 0.03);
+  --color-plane-1: #48cae4;
+  --color-plane-2: #0077b6;
+  --color-plane-3: #03045e;
+  --color-overlay-pink: rgba(72, 202, 228, 0.4);
+}
+
+[data-theme="ocean"].dark {
+  --color-bg: #010218;
+  --color-surface: #02062a;
+  --color-text: #caf0f8;
+  --color-text-muted: #7ab0c0;
+  --color-nav-glass: rgba(72, 202, 228, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #0a3040;
+  --color-plane-2: #001830;
+  --color-plane-3: #010218;
+  --color-overlay-pink: rgba(72, 202, 228, 0.25);
+}
+
+/* ===== Sunny Day (320 coins) ===== */
+[data-theme="sunny"] {
+  --color-bg: #fef6e4;
+  --color-surface: #fff8ec;
+  --color-accent: #f08c21;
+  --color-accent-dark: #e36888;
+  --color-text: #2c2416;
+  --color-text-muted: #6b5a40;
+  --color-nav-glass: rgba(240, 140, 33, 0.18);
+  --color-shadow: rgba(240, 140, 33, 0.12);
+  --color-shadow-light: rgba(240, 140, 33, 0.07);
+  --color-shadow-lighter: rgba(240, 140, 33, 0.03);
+  --color-plane-1: #f2d88f;
+  --color-plane-2: #6698cc;
+  --color-plane-3: #b4b534;
+  --color-overlay-pink: rgba(227, 104, 136, 0.4);
+}
+
+[data-theme="sunny"].dark {
+  --color-bg: #1a1608;
+  --color-surface: #2a2410;
+  --color-text: #fef6e4;
+  --color-text-muted: #b0a080;
+  --color-nav-glass: rgba(240, 140, 33, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #3d3018;
+  --color-plane-2: #142040;
+  --color-plane-3: #2a2a0a;
+  --color-overlay-pink: rgba(227, 104, 136, 0.25);
+}
+
+/* ===== Moonlight Shine (400 coins) ===== */
+[data-theme="moonlight"] {
+  --color-bg: #eee2df;
+  --color-surface: #f8f0ee;
+  --color-accent: #5b61b2;
+  --color-accent-dark: #2f80e4;
+  --color-text: #1a1a3a;
+  --color-text-muted: #4a4a6a;
+  --color-nav-glass: rgba(91, 97, 178, 0.18);
+  --color-shadow: rgba(91, 97, 178, 0.12);
+  --color-shadow-light: rgba(91, 97, 178, 0.07);
+  --color-shadow-lighter: rgba(91, 97, 178, 0.03);
+  --color-plane-1: #dec10b;
+  --color-plane-2: #6da0e1;
+  --color-plane-3: #5b61b2;
+  --color-overlay-pink: rgba(91, 97, 178, 0.4);
+}
+
+[data-theme="moonlight"].dark {
+  --color-bg: #0e0e1a;
+  --color-surface: #1a1a2e;
+  --color-text: #eee2df;
+  --color-text-muted: #9090b0;
+  --color-nav-glass: rgba(91, 97, 178, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #3d3400;
+  --color-plane-2: #142840;
+  --color-plane-3: #1a1a40;
+  --color-overlay-pink: rgba(91, 97, 178, 0.25);
+}
+
+/* ===== Mint Chocolate (500 coins) ===== */
+[data-theme="mint"] {
+  --color-bg: #fff0de;
+  --color-surface: #fff6ec;
+  --color-accent: #96c1c5;
+  --color-accent-dark: #694a47;
+  --color-text: #3a2a28;
+  --color-text-muted: #6b5450;
+  --color-nav-glass: rgba(150, 193, 197, 0.18);
+  --color-shadow: rgba(150, 193, 197, 0.12);
+  --color-shadow-light: rgba(150, 193, 197, 0.07);
+  --color-shadow-lighter: rgba(150, 193, 197, 0.03);
+  --color-plane-1: #96c1c5;
+  --color-plane-2: #694a47;
+  --color-plane-3: #c5a88a;
+  --color-overlay-pink: rgba(150, 193, 197, 0.4);
+}
+
+[data-theme="mint"].dark {
+  --color-bg: #1a1410;
+  --color-surface: #2a201a;
+  --color-text: #fff0de;
+  --color-text-muted: #b0a090;
+  --color-nav-glass: rgba(150, 193, 197, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #1a3030;
+  --color-plane-2: #2a1a18;
+  --color-plane-3: #302820;
+  --color-overlay-pink: rgba(150, 193, 197, 0.25);
+}
+
+/* ===== Blooming (800 coins) ===== */
+[data-theme="blooming"] {
+  --color-bg: #f8eef8;
+  --color-surface: #fff4ff;
+  --color-accent: #db3e8c;
+  --color-accent-dark: #7758a3;
+  --color-text: #2a1a30;
+  --color-text-muted: #5a4060;
+  --color-nav-glass: rgba(219, 62, 140, 0.18);
+  --color-shadow: rgba(219, 62, 140, 0.12);
+  --color-shadow-light: rgba(219, 62, 140, 0.07);
+  --color-shadow-lighter: rgba(219, 62, 140, 0.03);
+  --color-plane-1: #ffafeb;
+  --color-plane-2: #66a5ed;
+  --color-plane-3: #f6c45c;
+  --color-overlay-pink: rgba(219, 62, 140, 0.4);
+}
+
+[data-theme="blooming"].dark {
+  --color-bg: #140a18;
+  --color-surface: #221428;
+  --color-text: #f8eef8;
+  --color-text-muted: #a080b0;
+  --color-nav-glass: rgba(219, 62, 140, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
+  --color-plane-1: #401a30;
+  --color-plane-2: #142040;
+  --color-plane-3: #3d3010;
+  --color-overlay-pink: rgba(219, 62, 140, 0.25);
+}
+
+/* ===== Base body styles ===== */
 body {
-  @apply bg-cozy-cream text-cozy-ink antialiased;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "rlig" 1, "calt" 1;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Scrapbook grid paper background */
-.scrapbook-page {
-  background-size: 20px 20px;
-  background-image: linear-gradient(to right, rgb(232 226 217 / 0.5) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(232 226 217 / 0.5) 1px, transparent 1px);
-}
+/* ===== Glass utilities ===== */
+@layer components {
+  .glass {
+    background: var(--color-nav-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
 
-/* Washi-tape style borders */
-.washi-tape {
-  box-shadow: inset 0 0 0 3px var(--cozy-sage), 0 2px 4px rgb(0 0 0 / 0.06);
+  .glass-card {
+    background: var(--color-surface);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 2px 8px var(--color-shadow),
+      0 4px 16px var(--color-shadow-light),
+      0 8px 32px var(--color-shadow-lighter);
+  }
+
+  .glass-nav {
+    background: var(--color-nav-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 -2px 8px var(--color-shadow),
+      0 -4px 16px var(--color-shadow-light),
+      0 -8px 32px var(--color-shadow-lighter);
+  }
 }
 
 @layer utilities {

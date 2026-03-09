@@ -1,13 +1,12 @@
-import { ScrapbookCanvas } from "@/components/scrapbook/scrapbook-canvas";
 import { PomodoroTimerCard } from "@/components/pomodoro/pomodoro-timer-card";
+import { MusicPlayer } from "@/components/music-player";
 
 export default function PomodoroPage() {
   return (
-    <ScrapbookCanvas pageId="pomodoro">
-      <div className="space-y-6">
-        <h1 className="font-handwritten text-3xl text-cozy-ink">Pomodoro</h1>
-        <PomodoroTimerCard />
-      </div>
-    </ScrapbookCanvas>
+    <div className="space-y-6 max-w-lg mx-auto">
+      <h1 className="font-serif text-2xl text-theme-text text-center">Pomodoro</h1>
+      <PomodoroTimerCard />
+      <MusicPlayer />
+    </div>
   );
 }

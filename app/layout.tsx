@@ -1,18 +1,28 @@
 import type { Metadata } from "next";
-import { DM_Sans, Caveat } from "next/font/google";
+import { Albert_Sans, Instrument_Serif, Italianno } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
+import { ThemeProvider } from "@/components/theme-provider";
+import { PageTransitions } from "@/components/page-transitions";
 
-const dmSans = DM_Sans({
+const albertSans = Albert_Sans({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-sans",
   display: "swap",
 });
 
-const caveat = Caveat({
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
-  variable: "--font-caveat",
+  weight: "400",
+  variable: "--font-serif",
+  display: "swap",
+});
+
+const italianno = Italianno({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-cursive",
   display: "swap",
 });
 
@@ -27,10 +37,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${caveat.variable}`}>
+    <html
+      lang="en"
+      className={`${albertSans.variable} ${instrumentSerif.variable} ${italianno.variable}`}
+    >
       <body className="min-h-screen">
         <NuqsAdapter>
-          <AppShell>{children}</AppShell>
+          <ThemeProvider>
+            <PageTransitions>
+              <AppShell>{children}</AppShell>
+            </PageTransitions>
+          </ThemeProvider>
         </NuqsAdapter>
       </body>
     </html>

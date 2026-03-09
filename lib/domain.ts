@@ -49,6 +49,11 @@ export interface PlanItem {
   title: string;
   scheduledFor: string;
   status: PlanItemStatus;
+  startTime?: string;
+  endTime?: string;
+  description?: string;
+  isAllDay?: boolean;
+  color?: string;
 }
 
 export interface PomodoroSettings {
@@ -73,6 +78,26 @@ export interface ScrapbookItem {
   createdAt: string;
 }
 
+export type StudyGuideFormat = "tree" | "cornell" | "mapping";
+
+export interface StudyGuide {
+  id: string;
+  title: string;
+  format: StudyGuideFormat;
+  content: string;
+  rawSource: string;
+  createdAt: string;
+}
+
+export interface UserSettings {
+  totalPoints: number;
+  activeThemeId: string;
+  purchasedThemeIds: string[];
+  darkModeEnabled: boolean;
+  backgroundMusicEnabled: boolean;
+  displayName: string;
+}
+
 export interface StudyState {
   tracks: StudyTrack[];
   notes: Note[];
@@ -81,6 +106,8 @@ export interface StudyState {
   planItems: PlanItem[];
   scrapbookItems: ScrapbookItem[];
   pomodoroSettings: PomodoroSettings;
+  studyGuides: StudyGuide[];
+  userSettings: UserSettings;
 }
 
 export interface AiSummaryInput {

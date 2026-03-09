@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { localStudyRepository } from "@/lib/storage-local";
 import type { Flashcard } from "@/lib/domain";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export function FlashcardsContent() {
   const [cards, setCards] = useState<Flashcard[]>([]);
@@ -26,7 +24,9 @@ export function FlashcardsContent() {
         ? {
             ...f,
             lastReviewedAt: new Date().toISOString(),
-            easeScore: f.easeScore + (rating === "again" ? -0.2 : rating === "good" ? 0.1 : 0.2),
+            easeScore:
+              f.easeScore +
+              (rating === "again" ? -0.2 : rating === "good" ? 0.1 : 0.2),
           }
         : f
     );
@@ -38,45 +38,59 @@ export function FlashcardsContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-handwritten text-3xl text-cozy-ink">Flashcards</h1>
+      <h1 className="font-serif text-2xl text-theme-text">Flashcards</h1>
+
       {!hasCards && (
-        <Card>
-          <CardContent className="py-8 text-center text-cozy-muted">
-            No flashcards yet. Create notes and use &quot;Generate Flashcards&quot; on the Notes page.
-          </CardContent>
-        </Card>
+        <div className="glass-card rounded-2xl p-8 text-center">
+          <p className="text-sm text-theme-text-muted">
+            No flashcards yet. Create a study guide and use &quot;Generate
+            Flashcards&quot; to add some.
+          </p>
+        </div>
       )}
+
       {hasCards && current && (
-        <Card className="max-w-xl mx-auto">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-cozy-muted">
-              Card {index + 1} of {cards.length}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-lg text-cozy-ink">{current.question}</p>
-            {showAnswer ? (
-              <>
-                <p className="text-cozy-muted border-t border-cozy-grid pt-4">
-                  {current.answer}
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  <Button variant="destructive" size="sm" onClick={() => recordReview("again")}>
-                    Again
-                  </Button>
-                  <Button variant="secondary" size="sm" onClick={() => recordReview("good")}>
-                    Good
-                  </Button>
-                  <Button size="sm" onClick={() => recordReview("easy")}>
-                    Easy
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <Button onClick={() => setShowAnswer(true)}>Show answer</Button>
-            )}
-          </CardContent>
-        </Card>
+        <div className="glass-card rounded-2xl max-w-xl mx-auto p-6 space-y-4">
+          <p className="text-xs text-theme-text-muted">
+            Card {index + 1} of {cards.length}
+          </p>
+          <p className="font-serif text-lg text-theme-text">{current.question}</p>
+
+          {showAnswer ? (
+            <>
+              <div className="border-t border-theme-accent/20 pt-4">
+                <p className="text-sm text-theme-text-muted">{current.answer}</p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => recordReview("again")}
+                  className="px-4 py-2 rounded-xl text-xs font-medium bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                >
+                  Again
+                </button>
+                <button
+                  onClick={() => recordReview("good")}
+                  className="px-4 py-2 rounded-xl text-xs font-medium bg-theme-accent/10 text-theme-accent hover:bg-theme-accent/20 transition-colors"
+                >
+                  Good
+                </button>
+                <button
+                  onClick={() => recordReview("easy")}
+                  className="px-4 py-2 rounded-xl text-xs font-medium glass shadow-glass text-theme-text hover:scale-[1.02] transition-transform"
+                >
+                  Easy
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => setShowAnswer(true)}
+              className="glass rounded-xl px-6 py-2.5 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.02] transition-transform"
+            >
+              Show Answer
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
