@@ -130,10 +130,10 @@ export function PomodoroTimerCard() {
         className="glass rounded-full px-6 py-2 shadow-glass"
         style={{ borderColor: phaseColor, borderWidth: "1px" }}
       >
-        <span className="font-serif text-sm font-medium text-theme-text">
+        <span className="font-serif text-base font-medium text-theme-text">
           {PHASE_LABELS[phase]}
         </span>
-        <span className="text-xs text-theme-text-muted ml-2">
+        <span className="text-sm text-theme-text-muted ml-2">
           Session {completedFocusSessions + 1}
         </span>
       </div>
@@ -147,8 +147,9 @@ export function PomodoroTimerCard() {
             cy="100"
             r="90"
             fill="none"
-            stroke="var(--color-surface)"
+            stroke="var(--color-plane-3)"
             strokeWidth="6"
+            opacity="0.25"
           />
           <circle
             cx="100"
@@ -172,16 +173,25 @@ export function PomodoroTimerCard() {
       <div className="flex gap-3">
         <button
           onClick={toggle}
-          className="glass rounded-2xl px-8 py-3 shadow-glass font-serif text-sm font-medium text-theme-text hover:scale-[1.03] transition-transform"
+          className="glass rounded-2xl px-8 py-3 shadow-glass font-serif text-base font-medium text-theme-text hover:scale-[1.03] transition-transform"
         >
           {isRunning ? "Pause" : "Start"}
         </button>
         <button
           onClick={reset}
-          className="glass rounded-2xl px-6 py-3 shadow-glass font-serif text-sm text-theme-text-muted hover:scale-[1.03] transition-transform"
+          className="glass rounded-2xl px-6 py-3 shadow-glass font-serif text-base text-theme-text-muted hover:scale-[1.03] transition-transform"
         >
           Reset
         </button>
+      </div>
+
+      {/* Coin hint */}
+      <div className="flex items-center gap-2 text-theme-text-muted">
+        <svg className="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="9" fill="var(--color-accent-yellow)" opacity="0.6" />
+          <text x="10" y="14" textAnchor="middle" fontSize="10" fill="var(--color-text)" fontWeight="bold">$</text>
+        </svg>
+        <span className="text-sm">Earn 2 coins per minute of focus time</span>
       </div>
 
       {/* Presets (only when not running and on focus phase) */}
@@ -233,13 +243,13 @@ function PresetRow({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-xs text-theme-text-muted">{label}</span>
+      <span className="text-sm text-theme-text-muted">{label}</span>
       <div className="flex gap-1.5">
         {options.map((m) => (
           <button
             key={m}
             onClick={() => onChange(m)}
-            className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               value === m
                 ? "bg-theme-accent text-white"
                 : "bg-theme-bg text-theme-text-muted hover:bg-theme-accent/10"

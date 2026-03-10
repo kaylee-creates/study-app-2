@@ -10,6 +10,7 @@ import {
 import type { UserSettings } from "@/lib/domain";
 import { localStudyRepository } from "@/lib/storage-local";
 import { THEMES } from "@/lib/themes";
+import { PointsToast } from "@/components/ui/points-toast";
 
 interface ThemeContextValue {
   settings: UserSettings;
@@ -49,6 +50,7 @@ export function useTheme() {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [toastAmount, setToastAmount] = useState<number | null>(null);
 
   useEffect(() => {
     localStudyRepository.getUserSettings().then((s) => {
@@ -127,6 +129,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         ...settings,
         totalPoints: settings.totalPoints + amount,
       });
+      setToastAmount(amount);
     },
     [settings, persistSettings]
   );
@@ -145,6 +148,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
+      {toastAmount !== null && (
+        <PointsToast amount={toastAmount} onDone={() => setToastAmount(null)} />
+      )}
     </ThemeContext.Provider>
   );
 }

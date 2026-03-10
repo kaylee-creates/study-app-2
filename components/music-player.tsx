@@ -185,10 +185,10 @@ export function MusicPlayer() {
           </button>
 
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-theme-text truncate font-medium">
+            <p className="text-sm text-theme-text truncate font-medium">
               {usingCustom ? "Custom Track" : "Theme Music"}
             </p>
-            <p className="text-[10px] text-theme-text-muted truncate">
+            <p className="text-xs text-theme-text-muted truncate">
               {isPlaying ? "Playing" : "Paused"}
               {usingCustom && isPlaying ? " (video bg)" : ""}
             </p>
@@ -209,20 +209,20 @@ export function MusicPlayer() {
             value={customUrl}
             onChange={(e) => setCustomUrl(e.target.value)}
             placeholder="Paste YouTube URL..."
-            className="flex-1 rounded-lg px-2 py-1 text-xs bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50"
+            className="flex-1 rounded-lg px-2 py-1.5 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50"
           />
           {usingCustom ? (
             <button
               type="button"
               onClick={clearCustom}
-              className="text-[10px] px-2 py-1 rounded-lg bg-theme-accent/10 text-theme-text-muted"
+              className="text-xs px-3 py-1.5 rounded-lg bg-theme-accent/10 text-theme-text-muted"
             >
               Reset
             </button>
           ) : (
             <button
               type="submit"
-              className="text-[10px] px-2 py-1 rounded-lg bg-theme-accent text-white"
+              className="text-xs px-3 py-1.5 rounded-lg bg-theme-accent text-white"
             >
               Play
             </button>

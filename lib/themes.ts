@@ -42,27 +42,6 @@ export const THEMES: ThemeDefinition[] = [
     colors: ["#6698CC", "#B4B534", "#F2D88F", "#E36888", "#F08C21"],
     youtubeUrl: "",
   },
-  {
-    id: "moonlight",
-    name: "Moonlight Shine",
-    cost: 400,
-    colors: ["#EEE2DF", "#DEC10B", "#5B61B2", "#2F80E4", "#6DA0E1"],
-    youtubeUrl: "",
-  },
-  {
-    id: "mint",
-    name: "Mint Chocolate",
-    cost: 500,
-    colors: ["#96C1C5", "#694A47", "#FFF0DE"],
-    youtubeUrl: "",
-  },
-  {
-    id: "blooming",
-    name: "Blooming",
-    cost: 800,
-    colors: ["#7758A3", "#66A5ED", "#F6C45C", "#FFAFEB", "#DB3E8C"],
-    youtubeUrl: "",
-  },
 ];
 
 export function getThemeById(id: string): ThemeDefinition | undefined {

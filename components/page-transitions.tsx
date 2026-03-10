@@ -1,21 +1,20 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { WelcomeModal } from "@/components/welcome-modal";
 
 export function PageTransitions({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const { settings, isLoaded } = useTheme();
   const [showWelcome, setShowWelcome] = useState(false);
   const [blurActive, setBlurActive] = useState(true);
-  const [pinkFade, setPinkFade] = useState(false);
-  const [prevPath, setPrevPath] = useState(pathname);
   const [welcomeCheckDone, setWelcomeCheckDone] = useState(false);
+  const welcomeDismissed = useRef(false);
 
   useEffect(() => {
     if (!isLoaded) return;
+    if (welcomeDismissed.current) return;
+
     const hasVisited = sessionStorage.getItem("kaylee-visited");
     if (!settings.displayName) {
       setShowWelcome(true);
@@ -25,7 +24,7 @@ export function PageTransitions({ children }: { children: React.ReactNode }) {
       setTimeout(() => {
         setBlurActive(false);
         sessionStorage.setItem("kaylee-visited", "1");
-      }, 100);
+      }, 300);
     } else {
       setBlurActive(false);
     }
@@ -33,25 +32,16 @@ export function PageTransitions({ children }: { children: React.ReactNode }) {
   }, [isLoaded, settings.displayName]);
 
   const handleWelcomeComplete = useCallback(() => {
+    welcomeDismissed.current = true;
     setShowWelcome(false);
     setTimeout(() => {
       setBlurActive(false);
       sessionStorage.setItem("kaylee-visited", "1");
-    }, 100);
+    }, 300);
   }, []);
 
-  // Pink fade on route change
-  useEffect(() => {
-    if (pathname !== prevPath) {
-      setPinkFade(true);
-      setPrevPath(pathname);
-      const timer = setTimeout(() => setPinkFade(false), 450);
-      return () => clearTimeout(timer);
-    }
-  }, [pathname, prevPath]);
-
   if (!isLoaded || !welcomeCheckDone) {
-    return <div className="min-h-screen bg-theme-bg" />;
+    return <div className="min-h-screen" style={{ background: "transparent" }} />;
   }
 
   return (
@@ -65,15 +55,6 @@ export function PageTransitions({ children }: { children: React.ReactNode }) {
           backdropFilter: blurActive ? "blur(20px)" : "blur(0px)",
           WebkitBackdropFilter: blurActive ? "blur(20px)" : "blur(0px)",
           opacity: blurActive ? 1 : 0,
-        }}
-      />
-
-      {/* Pink fade overlay on page change */}
-      <div
-        className="fixed inset-0 z-[80] pointer-events-none transition-opacity duration-[400ms] ease-out"
-        style={{
-          background: "var(--color-overlay-pink)",
-          opacity: pinkFade ? 1 : 0,
         }}
       />
 

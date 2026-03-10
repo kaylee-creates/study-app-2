@@ -6,39 +6,39 @@
 :root,
 [data-theme="original"] {
   --color-bg: #ffffff;
-  --color-surface: #fefefe;
+  --color-surface: #f2f8f2;
   --color-accent: #f2a7b0;
   --color-accent-dark: #d4808a;
+  --color-accent-yellow: #f5e6a3;
   --color-text: #2c2c2c;
   --color-text-muted: #6b6b6b;
-  --color-nav-glass: rgba(242, 167, 176, 0.18);
-  --color-shadow: rgba(242, 167, 176, 0.12);
-  --color-shadow-light: rgba(242, 167, 176, 0.07);
-  --color-shadow-lighter: rgba(242, 167, 176, 0.03);
-  --color-plane-1: #f2b5b0;
-  --color-plane-2: #ecd57e;
-  --color-plane-3: #b8d4a8;
-  --color-overlay-pink: rgba(242, 167, 176, 0.4);
+  --color-nav-glass: rgba(243, 218, 222, 0.25);
+  --color-shadow: rgba(214, 173, 191, 0.15);
+  --color-shadow-light: rgba(214, 173, 191, 0.08);
+  --color-shadow-lighter: rgba(214, 173, 191, 0.03);
+  --color-plane-1: #f8c8d4;
+  --color-plane-2: #f5e6a3;
+  --color-plane-3: #c5e6c0;
 }
 
 [data-theme="original"].dark {
-  --color-bg: #1a1216;
-  --color-surface: #261a1f;
+  --color-bg: #000000;
+  --color-surface: #1a1f1a;
+  --color-accent-yellow: #c4b66e;
   --color-text: #f0e6e8;
   --color-text-muted: #a89a9d;
-  --color-nav-glass: rgba(242, 167, 176, 0.12);
+  --color-nav-glass: rgba(197, 230, 192, 0.12);
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-light: rgba(0, 0, 0, 0.2);
   --color-shadow-lighter: rgba(0, 0, 0, 0.1);
   --color-plane-1: #3d2028;
   --color-plane-2: #3d3620;
   --color-plane-3: #1e3d1a;
-  --color-overlay-pink: rgba(242, 167, 176, 0.25);
 }
 
 /* ===== Berry (40 coins) ===== */
 [data-theme="berry"] {
-  --color-bg: #f9dbbd;
+  --color-bg: #ffffff;
   --color-surface: #ffeadd;
   --color-accent: #da627d;
   --color-accent-dark: #a53860;
@@ -51,11 +51,11 @@
   --color-plane-1: #ffa5ab;
   --color-plane-2: #da627d;
   --color-plane-3: #a53860;
-  --color-overlay-pink: rgba(218, 98, 125, 0.4);
+  --color-accent-yellow: #ffa5ab;
 }
 
 [data-theme="berry"].dark {
-  --color-bg: #1a0710;
+  --color-bg: #000000;
   --color-surface: #2d0f1c;
   --color-text: #f9dbbd;
   --color-text-muted: #c9a090;
@@ -66,12 +66,12 @@
   --color-plane-1: #4d1a28;
   --color-plane-2: #3d1020;
   --color-plane-3: #2d0a18;
-  --color-overlay-pink: rgba(218, 98, 125, 0.25);
+  --color-accent-yellow: #6b3040;
 }
 
 /* ===== Ice Cream Sundae (80 coins) ===== */
 [data-theme="icecream"] {
-  --color-bg: #efcfe3;
+  --color-bg: #ffffff;
   --color-surface: #f8e0f0;
   --color-accent: #e27396;
   --color-accent-dark: #eb9ab2;
@@ -84,11 +84,11 @@
   --color-plane-1: #ecf2d8;
   --color-plane-2: #b3dee2;
   --color-plane-3: #eb9ab2;
-  --color-overlay-pink: rgba(226, 115, 150, 0.4);
+  --color-accent-yellow: #ecf2d8;
 }
 
 [data-theme="icecream"].dark {
-  --color-bg: #1a0f16;
+  --color-bg: #000000;
   --color-surface: #2a1a24;
   --color-text: #efcfe3;
   --color-text-muted: #b09aaa;
@@ -99,12 +99,12 @@
   --color-plane-1: #2a3020;
   --color-plane-2: #1a2a2c;
   --color-plane-3: #3a1a28;
-  --color-overlay-pink: rgba(226, 115, 150, 0.25);
+  --color-accent-yellow: #2a3020;
 }
 
 /* ===== Ocean (160 coins) ===== */
 [data-theme="ocean"] {
-  --color-bg: #caf0f8;
+  --color-bg: #ffffff;
   --color-surface: #e0f7fc;
   --color-accent: #48cae4;
   --color-accent-dark: #0077b6;
@@ -117,7 +117,7 @@
   --color-plane-1: #48cae4;
   --color-plane-2: #0077b6;
   --color-plane-3: #03045e;
-  --color-overlay-pink: rgba(72, 202, 228, 0.4);
+  --color-accent-yellow: #48cae4;
 }
 
 [data-theme="ocean"].dark {
@@ -132,12 +132,12 @@
   --color-plane-1: #0a3040;
   --color-plane-2: #001830;
   --color-plane-3: #010218;
-  --color-overlay-pink: rgba(72, 202, 228, 0.25);
+  --color-accent-yellow: #0a3040;
 }
 
 /* ===== Sunny Day (320 coins) ===== */
 [data-theme="sunny"] {
-  --color-bg: #fef6e4;
+  --color-bg: #ffffff;
   --color-surface: #fff8ec;
   --color-accent: #f08c21;
   --color-accent-dark: #e36888;
@@ -150,11 +150,11 @@
   --color-plane-1: #f2d88f;
   --color-plane-2: #6698cc;
   --color-plane-3: #b4b534;
-  --color-overlay-pink: rgba(227, 104, 136, 0.4);
+  --color-accent-yellow: #f2d88f;
 }
 
 [data-theme="sunny"].dark {
-  --color-bg: #1a1608;
+  --color-bg: #000000;
   --color-surface: #2a2410;
   --color-text: #fef6e4;
   --color-text-muted: #b0a080;
@@ -165,106 +165,7 @@
   --color-plane-1: #3d3018;
   --color-plane-2: #142040;
   --color-plane-3: #2a2a0a;
-  --color-overlay-pink: rgba(227, 104, 136, 0.25);
-}
-
-/* ===== Moonlight Shine (400 coins) ===== */
-[data-theme="moonlight"] {
-  --color-bg: #eee2df;
-  --color-surface: #f8f0ee;
-  --color-accent: #5b61b2;
-  --color-accent-dark: #2f80e4;
-  --color-text: #1a1a3a;
-  --color-text-muted: #4a4a6a;
-  --color-nav-glass: rgba(91, 97, 178, 0.18);
-  --color-shadow: rgba(91, 97, 178, 0.12);
-  --color-shadow-light: rgba(91, 97, 178, 0.07);
-  --color-shadow-lighter: rgba(91, 97, 178, 0.03);
-  --color-plane-1: #dec10b;
-  --color-plane-2: #6da0e1;
-  --color-plane-3: #5b61b2;
-  --color-overlay-pink: rgba(91, 97, 178, 0.4);
-}
-
-[data-theme="moonlight"].dark {
-  --color-bg: #0e0e1a;
-  --color-surface: #1a1a2e;
-  --color-text: #eee2df;
-  --color-text-muted: #9090b0;
-  --color-nav-glass: rgba(91, 97, 178, 0.12);
-  --color-shadow: rgba(0, 0, 0, 0.3);
-  --color-shadow-light: rgba(0, 0, 0, 0.2);
-  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
-  --color-plane-1: #3d3400;
-  --color-plane-2: #142840;
-  --color-plane-3: #1a1a40;
-  --color-overlay-pink: rgba(91, 97, 178, 0.25);
-}
-
-/* ===== Mint Chocolate (500 coins) ===== */
-[data-theme="mint"] {
-  --color-bg: #fff0de;
-  --color-surface: #fff6ec;
-  --color-accent: #96c1c5;
-  --color-accent-dark: #694a47;
-  --color-text: #3a2a28;
-  --color-text-muted: #6b5450;
-  --color-nav-glass: rgba(150, 193, 197, 0.18);
-  --color-shadow: rgba(150, 193, 197, 0.12);
-  --color-shadow-light: rgba(150, 193, 197, 0.07);
-  --color-shadow-lighter: rgba(150, 193, 197, 0.03);
-  --color-plane-1: #96c1c5;
-  --color-plane-2: #694a47;
-  --color-plane-3: #c5a88a;
-  --color-overlay-pink: rgba(150, 193, 197, 0.4);
-}
-
-[data-theme="mint"].dark {
-  --color-bg: #1a1410;
-  --color-surface: #2a201a;
-  --color-text: #fff0de;
-  --color-text-muted: #b0a090;
-  --color-nav-glass: rgba(150, 193, 197, 0.12);
-  --color-shadow: rgba(0, 0, 0, 0.3);
-  --color-shadow-light: rgba(0, 0, 0, 0.2);
-  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
-  --color-plane-1: #1a3030;
-  --color-plane-2: #2a1a18;
-  --color-plane-3: #302820;
-  --color-overlay-pink: rgba(150, 193, 197, 0.25);
-}
-
-/* ===== Blooming (800 coins) ===== */
-[data-theme="blooming"] {
-  --color-bg: #f8eef8;
-  --color-surface: #fff4ff;
-  --color-accent: #db3e8c;
-  --color-accent-dark: #7758a3;
-  --color-text: #2a1a30;
-  --color-text-muted: #5a4060;
-  --color-nav-glass: rgba(219, 62, 140, 0.18);
-  --color-shadow: rgba(219, 62, 140, 0.12);
-  --color-shadow-light: rgba(219, 62, 140, 0.07);
-  --color-shadow-lighter: rgba(219, 62, 140, 0.03);
-  --color-plane-1: #ffafeb;
-  --color-plane-2: #66a5ed;
-  --color-plane-3: #f6c45c;
-  --color-overlay-pink: rgba(219, 62, 140, 0.4);
-}
-
-[data-theme="blooming"].dark {
-  --color-bg: #140a18;
-  --color-surface: #221428;
-  --color-text: #f8eef8;
-  --color-text-muted: #a080b0;
-  --color-nav-glass: rgba(219, 62, 140, 0.12);
-  --color-shadow: rgba(0, 0, 0, 0.3);
-  --color-shadow-light: rgba(0, 0, 0, 0.2);
-  --color-shadow-lighter: rgba(0, 0, 0, 0.1);
-  --color-plane-1: #401a30;
-  --color-plane-2: #142040;
-  --color-plane-3: #3d3010;
-  --color-overlay-pink: rgba(219, 62, 140, 0.25);
+  --color-accent-yellow: #3d3018;
 }
 
 /* ===== Base body styles ===== */

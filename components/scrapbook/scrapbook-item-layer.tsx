@@ -145,12 +145,13 @@ export function ScrapbookItemLayer({
       ref={wrapperRef}
       className="absolute cursor-grab active:cursor-grabbing group"
       style={{
-        left: item.x,
-        top: item.y,
-        width: item.width,
-        height: item.height,
+        left: item.x - 12,
+        top: item.y - 44,
+        width: item.width + 24,
+        height: item.height + 56,
         zIndex: item.zIndex,
         transform: `rotate(${rotation}deg)`,
+        overflow: "visible",
       }}
       onPointerDown={handleDragDown}
       onPointerMove={handlePointerMove}
@@ -158,9 +159,15 @@ export function ScrapbookItemLayer({
     >
       <div
         className={cn(
-          "w-full h-full rounded-lg overflow-hidden border-2 border-theme-accent/20 bg-theme-surface shadow-md transition",
+          "absolute rounded-lg overflow-hidden border-2 border-theme-accent/20 bg-theme-surface shadow-md transition",
           mode === "drag" && "ring-2 ring-theme-accent ring-offset-2"
         )}
+        style={{
+          left: 12,
+          top: 44,
+          width: item.width,
+          height: item.height,
+        }}
       >
         <img
           src={item.imageUrl}
@@ -171,7 +178,7 @@ export function ScrapbookItemLayer({
       </div>
 
       {/* Top toolbar: bring forward / remove */}
-      <div className="absolute -top-8 right-0 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ top: 8, right: 12 }}>
         <Button
           type="button"
           variant="ghost"
@@ -198,7 +205,7 @@ export function ScrapbookItemLayer({
       <div
         data-handle="rotate"
         className="absolute opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ left: "50%", top: "-36px", transform: "translateX(-50%)" }}
+        style={{ left: "50%", top: "2px", transform: "translateX(-50%)" }}
       >
         <div className="flex flex-col items-center">
           <div
@@ -214,8 +221,8 @@ export function ScrapbookItemLayer({
       {/* Resize handle -- bottom-right corner */}
       <div
         data-handle="resize"
-        className="absolute bottom-0 right-0 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-se-resize"
-        style={{ transform: "translate(25%, 25%)" }}
+        className="absolute w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity cursor-se-resize"
+        style={{ bottom: 0, right: 4 }}
         onPointerDown={handleResizeDown}
         onPointerMove={handleResizeMove}
         onPointerUp={handleResizeUp}
@@ -226,32 +233,8 @@ export function ScrapbookItemLayer({
       {/* Resize handle -- bottom-left corner */}
       <div
         data-handle="resize"
-        className="absolute bottom-0 left-0 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-sw-resize"
-        style={{ transform: "translate(-25%, 25%)" }}
-        onPointerDown={handleResizeDown}
-        onPointerMove={handleResizeMove}
-        onPointerUp={handleResizeUp}
-      >
-        <div className="w-full h-full rounded-sm border-2 border-theme-accent bg-white" />
-      </div>
-
-      {/* Resize handle -- top-right corner */}
-      <div
-        data-handle="resize"
-        className="absolute top-0 right-0 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-ne-resize"
-        style={{ transform: "translate(25%, -25%)" }}
-        onPointerDown={handleResizeDown}
-        onPointerMove={handleResizeMove}
-        onPointerUp={handleResizeUp}
-      >
-        <div className="w-full h-full rounded-sm border-2 border-theme-accent bg-white" />
-      </div>
-
-      {/* Resize handle -- top-left corner */}
-      <div
-        data-handle="resize"
-        className="absolute top-0 left-0 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-nw-resize"
-        style={{ transform: "translate(-25%, -25%)" }}
+        className="absolute w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity cursor-sw-resize"
+        style={{ bottom: 0, left: 4 }}
         onPointerDown={handleResizeDown}
         onPointerMove={handleResizeMove}
         onPointerUp={handleResizeUp}

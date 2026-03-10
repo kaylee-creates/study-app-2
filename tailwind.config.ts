@@ -15,6 +15,7 @@ const config: Config = {
           surface: "var(--color-surface)",
           accent: "var(--color-accent)",
           "accent-dark": "var(--color-accent-dark)",
+          "accent-yellow": "var(--color-accent-yellow)",
           text: "var(--color-text)",
           "text-muted": "var(--color-text-muted)",
           "nav-glass": "var(--color-nav-glass)",

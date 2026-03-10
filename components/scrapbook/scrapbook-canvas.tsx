@@ -153,7 +153,7 @@ export function ScrapbookCanvas({ pageId, children }: ScrapbookCanvasProps) {
             <span>Add PNG / image</span>
           </Button>
         </label>
-        <span className="text-xs text-theme-text-muted">
+        <span className="text-sm text-theme-text-muted">
           Drag, resize, or rotate items on the page
         </span>
       </div>

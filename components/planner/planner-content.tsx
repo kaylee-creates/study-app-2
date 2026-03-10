@@ -157,10 +157,15 @@ export function PlannerContent() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-2xl text-theme-text">Calendar</h1>
+        <div className="inline-block">
+          <h1 className="font-serif text-2xl text-theme-text">Calendar</h1>
+          <svg className="mt-0.5" width="100" height="8" viewBox="0 0 100 8" fill="none">
+            <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 98,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          </svg>
+        </div>
         <button
           onClick={() => openAddEvent()}
-          className="glass rounded-xl px-4 py-2 shadow-glass text-xs font-medium text-theme-text hover:scale-[1.02] transition-transform"
+          className="glass rounded-xl px-4 py-2 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.02] transition-transform"
         >
           + Add Event
         </button>
@@ -175,7 +180,7 @@ export function PlannerContent() {
           </span>
           <button
             onClick={goToday}
-            className="text-[10px] px-2 py-0.5 rounded bg-theme-accent/10 text-theme-accent font-medium"
+            className="text-xs px-2 py-0.5 rounded bg-theme-accent/10 text-theme-accent font-medium"
           >
             Today
           </button>
@@ -188,7 +193,7 @@ export function PlannerContent() {
         {/* Day headers */}
         <div className="grid grid-cols-7 mb-1">
           {DAYS.map((d) => (
-            <div key={d} className="text-center text-[10px] font-medium text-theme-text-muted py-1">
+            <div key={d} className="text-center text-xs font-medium text-theme-text-muted py-1">
               {d}
             </div>
           ))}
@@ -227,13 +232,13 @@ export function PlannerContent() {
                   {dayEvts.slice(0, 2).map((evt) => (
                     <div
                       key={evt.id}
-                      className="text-[9px] leading-tight text-theme-accent truncate px-1 py-0.5 rounded bg-theme-accent/10"
+                      className="text-[10px] leading-tight text-theme-accent truncate px-1 py-0.5 rounded bg-theme-accent/10"
                     >
                       {evt.title}
                     </div>
                   ))}
                   {dayEvts.length > 2 && (
-                    <div className="text-[9px] text-theme-text-muted px-1">
+                    <div className="text-[10px] text-theme-text-muted px-1">
                       +{dayEvts.length - 2} more
                     </div>
                   )}
@@ -248,18 +253,18 @@ export function PlannerContent() {
       {selectedDay && (
         <div className="glass-card rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-sm text-theme-text">
+            <h3 className="font-serif text-base text-theme-text">
               Events for {selectedDay}
             </h3>
             <button
               onClick={() => openAddEvent(selectedDay)}
-              className="text-xs text-theme-accent hover:underline"
+              className="text-sm text-theme-accent hover:underline"
             >
               + Add
             </button>
           </div>
           {dayEvents.length === 0 ? (
-            <p className="text-xs text-theme-text-muted">No events</p>
+            <p className="text-sm text-theme-text-muted">No events</p>
           ) : (
             <ul className="space-y-2">
               {dayEvents.map((evt) => (
