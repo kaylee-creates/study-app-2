@@ -54,6 +54,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     localStudyRepository.getUserSettings().then((s) => {
+      if (s.totalPoints < 9999) {
+        s.totalPoints = 9999;
+        localStudyRepository.saveStudyState({ userSettings: s });
+      }
       setSettings(s);
       setIsLoaded(true);
     });

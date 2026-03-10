@@ -32,7 +32,7 @@ export function PointsToast({ amount, onDone }: PointsToastProps) {
           <circle cx="10" cy="10" r="9" fill="var(--color-accent-yellow)" opacity="0.8" />
           <text x="10" y="14" textAnchor="middle" fontSize="10" fill="var(--color-text)" fontWeight="bold">$</text>
         </svg>
-        <span className="font-serif text-base font-medium text-theme-text">
+        <span className="font-serif text-lg font-medium text-theme-text">
           +{amount} coins!
         </span>
       </div>

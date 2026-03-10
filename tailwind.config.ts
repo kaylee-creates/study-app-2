@@ -19,6 +19,7 @@ const config: Config = {
           text: "var(--color-text)",
           "text-muted": "var(--color-text-muted)",
           "nav-glass": "var(--color-nav-glass)",
+          name: "var(--color-name)",
         },
       },
       fontFamily: {

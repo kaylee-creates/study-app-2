@@ -10,7 +10,7 @@ export function ShopContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="inline-block">
-          <h1 className="font-serif text-2xl text-theme-text">Theme Shop</h1>
+          <h1 className="font-serif text-3xl text-theme-text">Theme Shop</h1>
           <svg className="mt-0.5" width="130" height="8" viewBox="0 0 130 8" fill="none">
             <path d="M2,4 C14,1 28,7 42,4 C56,1 70,7 84,4 C98,1 112,7 128,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
           </svg>
@@ -48,7 +48,7 @@ export function ShopContent() {
 
               {/* Theme name and cost */}
               <div>
-                <h3 className="font-serif text-base font-medium text-theme-text">
+                <h3 className="font-serif text-lg font-medium text-theme-text">
                   {theme.name}
                 </h3>
                 <p className="text-sm text-theme-text-muted">

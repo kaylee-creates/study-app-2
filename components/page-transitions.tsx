@@ -50,7 +50,7 @@ export function PageTransitions({ children }: { children: React.ReactNode }) {
 
       {/* Blur-to-clear overlay */}
       <div
-        className="fixed inset-0 z-[90] pointer-events-none transition-all duration-[800ms] ease-out"
+        className="fixed inset-0 z-[90] pointer-events-none transition-all duration-[1200ms] ease-out"
         style={{
           backdropFilter: blurActive ? "blur(20px)" : "blur(0px)",
           WebkitBackdropFilter: blurActive ? "blur(20px)" : "blur(0px)",

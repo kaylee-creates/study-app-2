@@ -18,7 +18,7 @@ export function WelcomeModal({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="glass-card rounded-3xl p-8 max-w-sm w-full mx-4 text-center space-y-6">
-        <h2 className="font-cursive text-5xl text-theme-text">Kaylee</h2>
+        <h2 className="font-cursive text-6xl text-theme-text">Kaylee</h2>
         <p className="font-serif text-theme-text-muted">
           Welcome! What should we call you?
         </p>
@@ -33,7 +33,7 @@ export function WelcomeModal({ onComplete }: { onComplete: () => void }) {
           <button
             type="submit"
             disabled={!name.trim()}
-            className="w-full glass rounded-xl px-6 py-3 font-serif text-sm font-medium shadow-glass text-theme-text hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:hover:scale-100"
+            className="w-full glass rounded-xl px-6 py-3 font-serif text-base font-medium shadow-glass text-theme-text hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:hover:scale-100"
           >
             Get Started
           </button>

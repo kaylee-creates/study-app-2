@@ -158,7 +158,7 @@ export function PlannerContent() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="inline-block">
-          <h1 className="font-serif text-2xl text-theme-text">Calendar</h1>
+          <h1 className="font-serif text-3xl text-theme-text">Calendar</h1>
           <svg className="mt-0.5" width="100" height="8" viewBox="0 0 100 8" fill="none">
             <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 98,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
           </svg>
@@ -175,7 +175,7 @@ export function PlannerContent() {
       <div className="flex items-center justify-between glass-card rounded-2xl p-3">
         <button onClick={prevMonth} className="px-3 py-1 rounded-lg hover:bg-theme-accent/10 text-theme-text text-sm">&larr;</button>
         <div className="flex items-center gap-3">
-          <span className="font-serif text-lg text-theme-text">
+          <span className="font-serif text-xl text-theme-text">
             {MONTH_NAMES[month]} {year}
           </span>
           <button
@@ -253,7 +253,7 @@ export function PlannerContent() {
       {selectedDay && (
         <div className="glass-card rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-base text-theme-text">
+            <h3 className="font-serif text-lg text-theme-text">
               Events for {selectedDay}
             </h3>
             <button
@@ -301,7 +301,7 @@ export function PlannerContent() {
       {modalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
           <div className="glass-card rounded-3xl p-6 max-w-sm w-full mx-4 space-y-4">
-            <h3 className="font-serif text-lg text-theme-text">
+            <h3 className="font-serif text-xl text-theme-text">
               {editingId ? "Edit Event" : "New Event"}
             </h3>
             <input

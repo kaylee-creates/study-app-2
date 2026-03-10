@@ -130,7 +130,7 @@ export function PomodoroTimerCard() {
         className="glass rounded-full px-6 py-2 shadow-glass"
         style={{ borderColor: phaseColor, borderWidth: "1px" }}
       >
-        <span className="font-serif text-base font-medium text-theme-text">
+        <span className="font-serif text-lg font-medium text-theme-text">
           {PHASE_LABELS[phase]}
         </span>
         <span className="text-sm text-theme-text-muted ml-2">
@@ -173,13 +173,13 @@ export function PomodoroTimerCard() {
       <div className="flex gap-3">
         <button
           onClick={toggle}
-          className="glass rounded-2xl px-8 py-3 shadow-glass font-serif text-base font-medium text-theme-text hover:scale-[1.03] transition-transform"
+          className="glass rounded-2xl px-8 py-3 shadow-glass font-serif text-lg font-medium text-theme-text hover:scale-[1.03] transition-transform"
         >
           {isRunning ? "Pause" : "Start"}
         </button>
         <button
           onClick={reset}
-          className="glass rounded-2xl px-6 py-3 shadow-glass font-serif text-base text-theme-text-muted hover:scale-[1.03] transition-transform"
+          className="glass rounded-2xl px-6 py-3 shadow-glass font-serif text-lg text-theme-text-muted hover:scale-[1.03] transition-transform"
         >
           Reset
         </button>

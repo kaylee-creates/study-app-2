@@ -132,7 +132,7 @@ export function StudyGuideContent() {
   return (
     <div className="space-y-6">
       <div className="inline-block">
-        <h1 className="font-serif text-2xl text-theme-text">Study Guide</h1>
+        <h1 className="font-serif text-3xl text-theme-text">Study Guide</h1>
         <svg className="mt-0.5" width="120" height="8" viewBox="0 0 120 8" fill="none">
           <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 108,4 C112,3 116,4 118,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
         </svg>
@@ -166,7 +166,7 @@ export function StudyGuideContent() {
             onDragOver={(e) => e.preventDefault()}
             className="glass-card rounded-2xl p-8 text-center border-2 border-dashed border-theme-accent/30 hover:border-theme-accent/50 transition-colors"
           >
-            <p className="font-serif text-base text-theme-text-muted mb-3">
+            <p className="font-serif text-lg text-theme-text-muted mb-3">
               Drag & drop a text file or PDF to upload
             </p>
             <label className="inline-block glass rounded-xl px-5 py-2 shadow-glass text-base font-medium text-theme-text cursor-pointer hover:scale-[1.02] transition-transform">
@@ -203,7 +203,7 @@ export function StudyGuideContent() {
                     : "hover:border-theme-accent/50"
                 }`}
               >
-                <span className="block font-serif text-sm font-medium text-theme-text">
+                <span className="block font-serif text-base font-medium text-theme-text">
                   {opt.label}
                 </span>
                 <span className="block text-xs text-theme-text-muted mt-0.5">
@@ -217,7 +217,7 @@ export function StudyGuideContent() {
           <button
             onClick={generate}
             disabled={loading || !inputText.trim()}
-            className="w-full glass rounded-2xl px-6 py-3 shadow-glass font-serif text-base font-medium text-theme-text hover:scale-[1.01] transition-transform disabled:opacity-50"
+            className="w-full glass rounded-2xl px-6 py-3 shadow-glass font-serif text-lg font-medium text-theme-text hover:scale-[1.01] transition-transform disabled:opacity-50"
           >
             {loading ? "Generating..." : "Generate Study Guide"}
           </button>

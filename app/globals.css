@@ -11,29 +11,39 @@
   --color-accent-dark: #d4808a;
   --color-accent-yellow: #f5e6a3;
   --color-text: #2c2c2c;
-  --color-text-muted: #6b6b6b;
+  --color-text-muted: #4d4540;
   --color-nav-glass: rgba(243, 218, 222, 0.25);
+  --color-nav-glass-end: rgba(245, 230, 163, 0.2);
+  --color-btn-border: rgba(255, 255, 255, 0.35);
+  --color-btn-highlight: rgba(255, 255, 255, 0.25);
   --color-shadow: rgba(214, 173, 191, 0.15);
   --color-shadow-light: rgba(214, 173, 191, 0.08);
   --color-shadow-lighter: rgba(214, 173, 191, 0.03);
   --color-plane-1: #f8c8d4;
   --color-plane-2: #f5e6a3;
   --color-plane-3: #c5e6c0;
+  --color-name: #f2a7b0;
 }
 
 [data-theme="original"].dark {
   --color-bg: #000000;
   --color-surface: #1a1f1a;
+  --color-accent: #f2a7b0;
+  --color-accent-dark: #e88a96;
   --color-accent-yellow: #c4b66e;
   --color-text: #f0e6e8;
-  --color-text-muted: #a89a9d;
-  --color-nav-glass: rgba(197, 230, 192, 0.12);
+  --color-text-muted: #c4b0b4;
+  --color-nav-glass: rgba(197, 230, 192, 0.20);
+  --color-nav-glass-end: rgba(240, 180, 190, 0.15);
+  --color-btn-border: rgba(255, 255, 255, 0.15);
+  --color-btn-highlight: rgba(255, 255, 255, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-light: rgba(0, 0, 0, 0.2);
   --color-shadow-lighter: rgba(0, 0, 0, 0.1);
   --color-plane-1: #3d2028;
   --color-plane-2: #3d3620;
   --color-plane-3: #1e3d1a;
+  --color-name: #f4b8c0;
 }
 
 /* ===== Berry (40 coins) ===== */
@@ -43,8 +53,11 @@
   --color-accent: #da627d;
   --color-accent-dark: #a53860;
   --color-text: #450920;
-  --color-text-muted: #6b2a3d;
+  --color-text-muted: #551e30;
   --color-nav-glass: rgba(218, 98, 125, 0.18);
+  --color-nav-glass-end: rgba(255, 165, 171, 0.18);
+  --color-btn-border: rgba(255, 255, 255, 0.35);
+  --color-btn-highlight: rgba(255, 255, 255, 0.25);
   --color-shadow: rgba(218, 98, 125, 0.12);
   --color-shadow-light: rgba(218, 98, 125, 0.07);
   --color-shadow-lighter: rgba(218, 98, 125, 0.03);
@@ -52,21 +65,28 @@
   --color-plane-2: #da627d;
   --color-plane-3: #a53860;
   --color-accent-yellow: #ffa5ab;
+  --color-name: #7F0B35;
 }
 
 [data-theme="berry"].dark {
   --color-bg: #000000;
   --color-surface: #2d0f1c;
+  --color-accent: #e8899c;
+  --color-accent-dark: #d06880;
   --color-text: #f9dbbd;
-  --color-text-muted: #c9a090;
-  --color-nav-glass: rgba(218, 98, 125, 0.12);
+  --color-text-muted: #dab8a8;
+  --color-nav-glass: rgba(218, 98, 125, 0.22);
+  --color-nav-glass-end: rgba(180, 60, 90, 0.18);
+  --color-btn-border: rgba(255, 255, 255, 0.15);
+  --color-btn-highlight: rgba(255, 255, 255, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-light: rgba(0, 0, 0, 0.2);
   --color-shadow-lighter: rgba(0, 0, 0, 0.1);
   --color-plane-1: #4d1a28;
   --color-plane-2: #3d1020;
   --color-plane-3: #2d0a18;
-  --color-accent-yellow: #6b3040;
+  --color-accent-yellow: #e8899c;
+  --color-name: #b84a6e;
 }
 
 /* ===== Ice Cream Sundae (80 coins) ===== */
@@ -75,9 +95,12 @@
   --color-surface: #f8e0f0;
   --color-accent: #e27396;
   --color-accent-dark: #eb9ab2;
-  --color-text: #3a2030;
-  --color-text-muted: #6b4a5a;
-  --color-nav-glass: rgba(226, 115, 150, 0.18);
+  --color-text: #2a1520;
+  --color-text-muted: #3d2838;
+  --color-nav-glass: rgba(255, 255, 255, 0.45);
+  --color-nav-glass-end: rgba(236, 242, 216, 0.35);
+  --color-btn-border: rgba(255, 255, 255, 0.4);
+  --color-btn-highlight: rgba(255, 255, 255, 0.3);
   --color-shadow: rgba(226, 115, 150, 0.12);
   --color-shadow-light: rgba(226, 115, 150, 0.07);
   --color-shadow-lighter: rgba(226, 115, 150, 0.03);
@@ -85,21 +108,28 @@
   --color-plane-2: #b3dee2;
   --color-plane-3: #eb9ab2;
   --color-accent-yellow: #ecf2d8;
+  --color-name: #c85580;
 }
 
 [data-theme="icecream"].dark {
   --color-bg: #000000;
   --color-surface: #2a1a24;
+  --color-accent: #e8a0b8;
+  --color-accent-dark: #d480a0;
   --color-text: #efcfe3;
-  --color-text-muted: #b09aaa;
-  --color-nav-glass: rgba(226, 115, 150, 0.12);
+  --color-text-muted: #c8b0c2;
+  --color-nav-glass: rgba(226, 115, 150, 0.22);
+  --color-nav-glass-end: rgba(180, 80, 120, 0.18);
+  --color-btn-border: rgba(255, 255, 255, 0.15);
+  --color-btn-highlight: rgba(255, 255, 255, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-light: rgba(0, 0, 0, 0.2);
   --color-shadow-lighter: rgba(0, 0, 0, 0.1);
   --color-plane-1: #2a3020;
   --color-plane-2: #1a2a2c;
   --color-plane-3: #3a1a28;
-  --color-accent-yellow: #2a3020;
+  --color-accent-yellow: #b8c898;
+  --color-name: #e080a0;
 }
 
 /* ===== Ocean (160 coins) ===== */
@@ -109,8 +139,11 @@
   --color-accent: #48cae4;
   --color-accent-dark: #0077b6;
   --color-text: #03045e;
-  --color-text-muted: #1a3a6a;
+  --color-text-muted: #142e58;
   --color-nav-glass: rgba(72, 202, 228, 0.18);
+  --color-nav-glass-end: rgba(0, 119, 182, 0.15);
+  --color-btn-border: rgba(255, 255, 255, 0.35);
+  --color-btn-highlight: rgba(255, 255, 255, 0.25);
   --color-shadow: rgba(72, 202, 228, 0.12);
   --color-shadow-light: rgba(72, 202, 228, 0.07);
   --color-shadow-lighter: rgba(72, 202, 228, 0.03);
@@ -118,21 +151,28 @@
   --color-plane-2: #0077b6;
   --color-plane-3: #03045e;
   --color-accent-yellow: #48cae4;
+  --color-name: #0a4a8c;
 }
 
 [data-theme="ocean"].dark {
-  --color-bg: #010218;
+  --color-bg: #000000;
   --color-surface: #02062a;
+  --color-accent: #68d0ec;
+  --color-accent-dark: #3aa8d4;
   --color-text: #caf0f8;
-  --color-text-muted: #7ab0c0;
-  --color-nav-glass: rgba(72, 202, 228, 0.12);
+  --color-text-muted: #96c8d8;
+  --color-nav-glass: rgba(72, 202, 228, 0.22);
+  --color-nav-glass-end: rgba(40, 140, 180, 0.18);
+  --color-btn-border: rgba(255, 255, 255, 0.15);
+  --color-btn-highlight: rgba(255, 255, 255, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-light: rgba(0, 0, 0, 0.2);
   --color-shadow-lighter: rgba(0, 0, 0, 0.1);
   --color-plane-1: #0a3040;
   --color-plane-2: #001830;
   --color-plane-3: #010218;
-  --color-accent-yellow: #0a3040;
+  --color-accent-yellow: #5cb8d6;
+  --color-name: #4da8e8;
 }
 
 /* ===== Sunny Day (320 coins) ===== */
@@ -142,30 +182,40 @@
   --color-accent: #f08c21;
   --color-accent-dark: #e36888;
   --color-text: #2c2416;
-  --color-text-muted: #6b5a40;
+  --color-text-muted: #544630;
   --color-nav-glass: rgba(240, 140, 33, 0.18);
+  --color-nav-glass-end: rgba(242, 216, 143, 0.18);
+  --color-btn-border: rgba(255, 255, 255, 0.35);
+  --color-btn-highlight: rgba(255, 255, 255, 0.25);
   --color-shadow: rgba(240, 140, 33, 0.12);
   --color-shadow-light: rgba(240, 140, 33, 0.07);
   --color-shadow-lighter: rgba(240, 140, 33, 0.03);
   --color-plane-1: #f2d88f;
   --color-plane-2: #6698cc;
   --color-plane-3: #b4b534;
-  --color-accent-yellow: #f2d88f;
+  --color-accent-yellow: #c4a040;
+  --color-name: #d47218;
 }
 
 [data-theme="sunny"].dark {
   --color-bg: #000000;
   --color-surface: #2a2410;
+  --color-accent: #f0a040;
+  --color-accent-dark: #e88890;
   --color-text: #fef6e4;
-  --color-text-muted: #b0a080;
-  --color-nav-glass: rgba(240, 140, 33, 0.12);
+  --color-text-muted: #c8b898;
+  --color-nav-glass: rgba(240, 140, 33, 0.22);
+  --color-nav-glass-end: rgba(200, 100, 20, 0.18);
+  --color-btn-border: rgba(255, 255, 255, 0.15);
+  --color-btn-highlight: rgba(255, 255, 255, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-light: rgba(0, 0, 0, 0.2);
   --color-shadow-lighter: rgba(0, 0, 0, 0.1);
   --color-plane-1: #3d3018;
   --color-plane-2: #142040;
   --color-plane-3: #2a2a0a;
-  --color-accent-yellow: #3d3018;
+  --color-accent-yellow: #d4b868;
+  --color-name: #e89030;
 }
 
 /* ===== Base body styles ===== */

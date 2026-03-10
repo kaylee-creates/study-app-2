@@ -51,7 +51,7 @@ export function SettingsContent() {
       >
         {/* Profile section */}
         <div className="space-y-2">
-          <label className="font-serif text-base text-theme-text-muted">display name</label>
+          <label className="font-serif text-lg text-theme-text-muted">display name</label>
           <form onSubmit={handleNameSave} className="flex gap-2">
             <input
               value={nameInput}
@@ -73,7 +73,7 @@ export function SettingsContent() {
 
         {/* Light/Dark mode toggle */}
         <div className="flex items-center justify-between">
-          <span className="font-serif text-base text-theme-text-muted">
+          <span className="font-serif text-lg text-theme-text-muted">
             {settings.darkModeEnabled ? "dark mode" : "light mode"}
           </span>
           <button
@@ -103,7 +103,7 @@ export function SettingsContent() {
         {/* Background music */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="font-serif text-base text-theme-text-muted">background music</span>
+            <span className="font-serif text-lg text-theme-text-muted">background music</span>
             <button
               onClick={toggleBackgroundMusic}
               className="relative"
@@ -164,7 +164,7 @@ export function SettingsContent() {
           href="/shop"
           className="flex items-center justify-between py-2 px-1 rounded-xl hover:bg-white/10 transition-colors"
         >
-          <span className="font-serif text-base text-theme-text-muted">theme shop</span>
+          <span className="font-serif text-lg text-theme-text-muted">theme shop</span>
           <div className="flex items-center gap-2">
             <span className="text-sm text-theme-text-muted">
               <svg className="inline w-4 h-4 mr-1" viewBox="0 0 20 20" fill="none">

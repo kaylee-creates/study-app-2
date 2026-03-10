@@ -39,7 +39,7 @@ export function FlashcardsContent() {
   return (
     <div className="space-y-6">
       <div className="inline-block">
-        <h1 className="font-serif text-2xl text-theme-text">Flashcards</h1>
+        <h1 className="font-serif text-3xl text-theme-text">Flashcards</h1>
         <svg className="mt-0.5" width="110" height="8" viewBox="0 0 110 8" fill="none">
           <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 108,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
         </svg>
@@ -59,7 +59,7 @@ export function FlashcardsContent() {
           <p className="text-sm text-theme-text-muted">
             Card {index + 1} of {cards.length}
           </p>
-          <p className="font-serif text-lg text-theme-text">{current.question}</p>
+          <p className="font-serif text-xl text-theme-text">{current.question}</p>
 
           {showAnswer ? (
             <>
