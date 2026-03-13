@@ -1,9 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { localStudyRepository, generateId } from "@/lib/storage-local";
 import { useTheme } from "@/components/theme-provider";
-import type { StudyGuide, StudyGuideFormat, AiFlashcardSuggestion } from "@/lib/domain";
+import { extractText } from "@/lib/extract-text";
+import { CornellRenderer } from "@/components/study-guide/cornell-renderer";
+import type { StudyGuide, StudyGuideFormat } from "@/lib/domain";
 
 const FORMAT_OPTIONS: { value: StudyGuideFormat; label: string; desc: string }[] = [
   { value: "tree", label: "Tree Model", desc: "Hierarchical topics & subtopics" },
@@ -12,6 +15,7 @@ const FORMAT_OPTIONS: { value: StudyGuideFormat; label: string; desc: string }[]
 ];
 
 export function StudyGuideContent() {
+  const router = useRouter();
   const { addPoints } = useTheme();
   const [mode, setMode] = useState<"input" | "result">("input");
   const [inputText, setInputText] = useState("");
@@ -20,30 +24,43 @@ export function StudyGuideContent() {
   const [loading, setLoading] = useState(false);
   const [savedGuides, setSavedGuides] = useState<StudyGuide[]>([]);
   const [selectedGuide, setSelectedGuide] = useState<StudyGuide | null>(null);
-  const [flashcardsSuggested, setFlashcardsSuggested] = useState<AiFlashcardSuggestion[]>([]);
   const [flashcardsLoading, setFlashcardsLoading] = useState(false);
+  const [flashcardsError, setFlashcardsError] = useState("");
+  const [fileError, setFileError] = useState("");
 
   useEffect(() => {
     localStudyRepository.getStudyGuides().then(setSavedGuides);
+  }, []);
+
+  const processFile = useCallback(async (file: File) => {
+    setFileError("");
+    try {
+      const text = await extractText(file);
+      setInputText(text);
+    } catch (err) {
+      setFileError(err instanceof Error ? err.message : "Failed to read file.");
+    }
   }, []);
 
   const handleFileUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const text = await file.text();
-      setInputText(text);
+      await processFile(file);
       e.target.value = "";
     },
-    []
+    [processFile]
   );
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    file.text().then(setInputText);
-  }, []);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      processFile(file);
+    },
+    [processFile]
+  );
 
   const generate = async () => {
     if (!inputText.trim()) return;
@@ -83,6 +100,7 @@ export function StudyGuideContent() {
     const source = selectedGuide?.rawSource || inputText;
     if (!source.trim()) return;
     setFlashcardsLoading(true);
+    setFlashcardsError("");
     try {
       const res = await fetch("/api/ai/flashcards", {
         method: "POST",
@@ -90,30 +108,32 @@ export function StudyGuideContent() {
         body: JSON.stringify({ content: source, count: 5 }),
       });
       const data = await res.json();
-      if (res.ok && Array.isArray(data.cards)) {
-        setFlashcardsSuggested(data.cards);
+      if (!res.ok || !Array.isArray(data.cards) || data.cards.length === 0) {
+        setFlashcardsError("Could not generate flashcards. Please try again.");
+        return;
       }
+      const state = await localStudyRepository.loadStudyState();
+      const newCards = data.cards.map(
+        (c: { question: string; answer: string }) => ({
+          id: generateId(),
+          noteId: null,
+          trackId: null,
+          question: c.question,
+          answer: c.answer,
+          createdAt: new Date().toISOString(),
+          lastReviewedAt: null,
+          easeScore: 1,
+        })
+      );
+      await localStudyRepository.saveStudyState({
+        flashcards: [...state.flashcards, ...newCards],
+      });
+      router.push("/flashcards");
+    } catch {
+      setFlashcardsError("Failed to generate flashcards. Please try again.");
     } finally {
       setFlashcardsLoading(false);
     }
-  };
-
-  const addFlashcard = async (card: AiFlashcardSuggestion) => {
-    const state = await localStudyRepository.loadStudyState();
-    const newCard = {
-      id: generateId(),
-      noteId: null,
-      trackId: null,
-      question: card.question,
-      answer: card.answer,
-      createdAt: new Date().toISOString(),
-      lastReviewedAt: null,
-      easeScore: 1,
-    };
-    await localStudyRepository.saveStudyState({
-      flashcards: [...state.flashcards, newCard],
-    });
-    setFlashcardsSuggested((prev) => prev.filter((c) => c !== card));
   };
 
   const viewGuide = (guide: StudyGuide) => {
@@ -126,7 +146,7 @@ export function StudyGuideContent() {
     setMode("input");
     setSelectedGuide(null);
     setResult("");
-    setFlashcardsSuggested([]);
+    setFlashcardsError("");
   };
 
   return (
@@ -167,17 +187,20 @@ export function StudyGuideContent() {
             className="glass-card rounded-2xl p-8 text-center border-2 border-dashed border-theme-accent/30 hover:border-theme-accent/50 transition-colors"
           >
             <p className="font-serif text-lg text-theme-text-muted mb-3">
-              Drag & drop a text file or PDF to upload
+              Drag & drop a text file, PDF, or DOCX to upload
             </p>
             <label className="inline-block glass rounded-xl px-5 py-2 shadow-glass text-base font-medium text-theme-text cursor-pointer hover:scale-[1.02] transition-transform">
               Upload File
               <input
                 type="file"
-                accept=".txt,.md,.pdf,.doc,.docx"
+                accept=".txt,.md,.pdf,.docx"
                 onChange={handleFileUpload}
                 className="hidden"
               />
             </label>
+            {fileError && (
+              <p className="mt-2 text-sm text-red-500">{fileError}</p>
+            )}
           </div>
 
           {/* Manual text area */}
@@ -243,16 +266,36 @@ export function StudyGuideContent() {
           </button>
 
           {/* Rendered result */}
-          <div className="glass-card rounded-2xl p-6">
-            <div
-              className="prose prose-sm max-w-none text-theme-text
-                prose-headings:font-serif prose-headings:text-theme-text
-                prose-p:text-theme-text prose-li:text-theme-text
-                prose-strong:text-theme-text prose-a:text-theme-accent"
-            >
-              <MarkdownRenderer content={result} />
+          {(selectedGuide?.format ?? format) === "cornell" ? (
+            <CornellRenderer
+              title={selectedGuide?.title ?? inputText.slice(0, 50).trim()}
+              date={selectedGuide?.createdAt ?? new Date().toISOString()}
+              content={result}
+              onSave={async (newContent) => {
+                setResult(newContent);
+                if (selectedGuide) {
+                  const state = await localStudyRepository.loadStudyState();
+                  const updated = state.studyGuides.map((g) =>
+                    g.id === selectedGuide.id ? { ...g, content: newContent } : g
+                  );
+                  await localStudyRepository.saveStudyState({ studyGuides: updated });
+                  setSavedGuides(updated);
+                  setSelectedGuide({ ...selectedGuide, content: newContent });
+                }
+              }}
+            />
+          ) : (
+            <div className="glass-card rounded-2xl p-6">
+              <div
+                className="prose prose-sm max-w-none text-theme-text
+                  prose-headings:font-serif prose-headings:text-theme-text
+                  prose-p:text-theme-text prose-li:text-theme-text
+                  prose-strong:text-theme-text prose-a:text-theme-accent"
+              >
+                <MarkdownRenderer content={result} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Flashcard generation */}
           <div className="glass-card rounded-2xl p-4 space-y-3">
@@ -261,22 +304,10 @@ export function StudyGuideContent() {
               disabled={flashcardsLoading}
               className="glass rounded-xl px-4 py-2 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.02] transition-transform disabled:opacity-50"
             >
-              {flashcardsLoading ? "Generating..." : "Generate Flashcards"}
+              {flashcardsLoading ? "Generating & saving..." : "Generate Flashcards"}
             </button>
-            {flashcardsSuggested.length > 0 && (
-              <ul className="space-y-2">
-                {flashcardsSuggested.map((c, i) => (
-                  <li key={i} className="flex items-center justify-between gap-2 text-sm">
-                    <span className="text-theme-text">Q: {c.question}</span>
-                    <button
-                      onClick={() => addFlashcard(c)}
-                      className="shrink-0 px-2 py-1 rounded-lg bg-theme-accent/10 text-theme-accent text-xs font-medium hover:bg-theme-accent/20"
-                    >
-                      Add
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            {flashcardsError && (
+              <p className="text-sm text-red-500">{flashcardsError}</p>
             )}
           </div>
         </div>

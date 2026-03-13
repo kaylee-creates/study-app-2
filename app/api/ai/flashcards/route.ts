@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { callGemini, getGeminiKey } from "@/lib/gemini";
 import type { AiFlashcardSuggestion } from "@/lib/domain";
 
 interface RequestBody {
@@ -23,40 +24,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (apiKey) {
+  if (getGeminiKey()) {
     try {
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "user",
-              content: `From the following text, generate exactly ${Math.min(10, count)} flashcards. For each card provide a short question and a short answer. Format as JSON array: [{"question":"...","answer":"..."}, ...]. Return only the JSON array, no other text.\n\n${content.slice(0, 8000)}`,
-            },
-          ],
-          max_tokens: 1000,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.text();
-        return NextResponse.json(
-          { error: "AI provider error", details: err },
-          { status: 502 }
-        );
-      }
-      const data = (await res.json()) as {
-        choices?: { message?: { content?: string } }[];
-      };
-      const raw = data.choices?.[0]?.message?.content?.trim() ?? "[]";
+      const prompt = `From the following text, generate exactly ${Math.min(10, count)} flashcards. For each card provide a short question and a short answer. Format as JSON array: [{"question":"...","answer":"..."}, ...]. Return only the JSON array, no other text.\n\n${content.slice(0, 8000)}`;
+      const raw = await callGemini(prompt, 1000);
+      const cleaned = raw.replace(/^```json?\s*/i, "").replace(/```\s*$/, "").trim();
       let cards: AiFlashcardSuggestion[];
       try {
-        cards = JSON.parse(raw) as AiFlashcardSuggestion[];
+        cards = JSON.parse(cleaned) as AiFlashcardSuggestion[];
         if (!Array.isArray(cards))
           cards = [];
         else
