@@ -11,33 +11,49 @@ const navItems = [
   { href: "/study-guide", label: "Study", icon: BookIcon },
   { href: "/flashcards", label: "Cards", icon: CardsIcon },
   { href: "/planner", label: "Calendar", icon: CalendarIcon },
-  { href: "/scrapbook", label: "Scrapbook", icon: ScissorsIcon },
+  { href: "/whiteboard", label: "Whiteboard", icon: ScissorsIcon },
 ];
+
+const styles = {
+  root: "min-h-screen flex flex-col pb-20",
+  settingsLink:
+    "fixed top-4 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full glass shadow-glass transition-all hover:scale-105",
+  gearIcon: "w-5 h-5 text-theme-text-muted",
+  main: "flex-1 overflow-auto p-4 md:p-6",
+  nav: "fixed bottom-0 left-0 right-0 z-40 glass-nav",
+  navInner:
+    "flex max-w-lg mx-auto items-center justify-around px-1 py-2",
+  navLink:
+    "relative flex min-w-[3.5rem] flex-col items-center gap-1 rounded-xl px-2 py-1 transition-all",
+  navLinkActive: "scale-105 text-theme-accent",
+  navLinkInactive: "text-theme-text-muted hover:text-theme-accent",
+  navIcon: "w-5 h-5",
+  navLabel: "text-xs font-medium leading-none",
+  activeIndicator:
+    "absolute -bottom-0.5 left-1/2 h-1 w-4 -translate-x-1/2 rounded-full",
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { settings } = useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col pb-20">
+    <div className={styles.root}>
       {/* Corner settings button */}
       <Link
         href="/settings"
-        className={cn(
-          "fixed top-4 right-4 z-50 glass w-10 h-10 rounded-full flex items-center justify-center",
-          "shadow-glass transition-all hover:scale-105"
-        )}
+        className={styles.settingsLink}
         aria-label="Settings"
       >
-        <GearIcon className="w-5 h-5 text-theme-text-muted" />
+        <GearIcon className={styles.gearIcon} />
       </Link>
 
       {/* Main content */}
-      <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>
+      <main className={styles.main}>{children}</main>
 
       {/* Bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 glass-nav">
-        <div className="flex items-center justify-around max-w-lg mx-auto py-2 px-1">
+      <nav className={styles.nav}>
+        <div className={styles.navInner}>
           {navItems.map((item) => {
             const isActive =
               item.href === "/"
@@ -48,19 +64,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 px-2 py-1 rounded-xl transition-all min-w-[3.5rem] relative",
-                  isActive
-                    ? "text-theme-accent scale-105"
-                    : "text-theme-text-muted hover:text-theme-accent"
+                  styles.navLink,
+                  isActive ? styles.navLinkActive : styles.navLinkInactive
                 )}
               >
-                <item.icon className="w-5 h-5" />
-                <span className="text-xs font-medium leading-none">
+                <item.icon className={styles.navIcon} />
+                <span className={styles.navLabel}>
                   {item.label}
                 </span>
                 {isActive && (
                   <span
-                    className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-1 rounded-full"
+                    className={styles.activeIndicator}
                     style={{ background: "var(--color-accent-yellow)" }}
                   />
                 )}
@@ -140,4 +154,3 @@ function ScissorsIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-

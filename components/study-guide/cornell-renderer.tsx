@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { HighlightColor, NotepadEntry } from "@/lib/domain";
 
 interface CornellRendererProps {
+  guideId?: string;
+  guideTitle: string;
   title: string;
   date: string;
   content: string;
+  notepadEntries: NotepadEntry[];
   onSave: (newContent: string) => void;
+  onCreateNotepadEntry?: (
+    text: string,
+    color: HighlightColor,
+    note: string
+  ) => void | Promise<void>;
 }
 
 interface CornellSections {
@@ -24,6 +33,115 @@ interface QuizAnswer {
   feedback: string;
 }
 
+const styles = {
+  cardRoot: "glass-card overflow-hidden rounded-2xl",
+  bodyStack: "space-y-4 p-4",
+  header: "flex items-center justify-between border-b border-theme-accent/20 px-6 py-4",
+  headerDate: "text-small italic text-theme-text-muted",
+  headerTitle: "font-serif text-2xl font-bold text-theme-text",
+  headerTitleUnderline: "mt-1 h-1 w-20 rounded-full bg-theme-accent/40",
+
+  cornellFrame: "overflow-hidden rounded-xl border-2 border-theme-accent/35 bg-theme-bg/35",
+  cornellTop: "grid md:grid-cols-[minmax(0,30%)_minmax(0,70%)] md:max-h-[58vh]",
+  cornellCueColumn:
+    "border-b border-theme-accent/35 p-4 md:h-[58vh] md:overflow-y-auto md:border-b-0 md:border-r themed-scrollbar",
+  cornellNotesColumn: "relative p-4",
+  cornellSummaryRow: "border-t-2 border-theme-accent/35 p-4",
+  cornellTitle: "font-serif text-section-title font-bold text-theme-accent",
+  cornellSubTitle: "mt-4 mb-2 font-serif text-card-title font-semibold text-theme-accent",
+
+  editAreaRoot: "space-y-2",
+  editActions: "flex gap-2",
+  editButton:
+    "ml-2 text-caption text-theme-accent opacity-0 transition-opacity hover:underline group-hover:opacity-100",
+  editCancelButton:
+    "rounded-lg px-3 py-1 text-caption font-medium text-theme-text-muted transition-colors hover:bg-theme-accent/10",
+  editSaveButton:
+    "rounded-lg bg-theme-accent/10 px-3 py-1 text-caption font-medium text-theme-accent transition-colors hover:bg-theme-accent/20",
+  editTextarea:
+    "w-full resize-y rounded-lg border border-theme-accent/20 bg-theme-bg px-3 py-2 text-body text-theme-text focus:border-theme-accent focus:outline-none",
+
+  inlineStrong: "font-bold text-theme-text",
+  keywordBlock: "mb-2 ml-1",
+  keywordDefinition: "mt-0.5 text-small leading-snug text-theme-text-muted",
+  keywordTerm: "text-card-title font-bold text-theme-text",
+  keywordsParagraph: "text-body text-theme-text",
+  keywordsSubheading:
+    "mt-4 mb-2 first:mt-0 text-small font-bold uppercase tracking-wider text-theme-accent",
+
+  notesListBullet: "ml-5 list-disc text-body leading-relaxed text-theme-text",
+  notesListNested: "ml-10 list-disc text-small leading-relaxed text-theme-text-muted",
+  notesListNumbered: "ml-5 list-decimal text-body font-medium leading-relaxed text-theme-text",
+  notesParagraph: "text-body leading-relaxed text-theme-text",
+  notesSpacer: "h-2",
+  notesSubheading: "mt-5 mb-2 first:mt-0 text-card-title font-serif font-bold text-theme-text",
+
+  sectionHeaderRow: "group flex items-center",
+  sectionListItem: "ml-4 list-disc text-body leading-relaxed text-theme-text",
+  sectionParagraph: "text-body leading-relaxed text-theme-text",
+  summaryContent: "mt-2",
+
+  quizCheckButton:
+    "rounded-lg bg-theme-accent/10 px-3 py-1.5 text-caption font-medium text-theme-accent transition-colors hover:bg-theme-accent/20 disabled:opacity-50",
+  quizFeedbackCorrect:
+    "rounded-lg bg-green-500/10 px-3 py-2 text-small text-green-600 dark:text-green-400",
+  quizFeedbackIncorrect: "rounded-lg bg-red-500/10 px-3 py-2 text-small text-red-600 dark:text-red-400",
+  quizFeedbackLabel: "font-medium",
+  quizFooter: "flex items-center justify-between border-t border-theme-accent/10 pt-2",
+  quizInput:
+    "flex-1 rounded-lg border border-theme-accent/20 bg-theme-bg px-3 py-1.5 text-small text-theme-text focus:border-theme-accent focus:outline-none disabled:opacity-50",
+  quizInputRow: "flex gap-2",
+  quizQuestionBlock: "space-y-1.5",
+  quizQuestionText: "text-body font-medium text-theme-text",
+  quizResetButton: "ml-auto text-caption text-theme-accent hover:underline",
+  quizRoot: "space-y-4",
+  quizScore: "text-small text-theme-text-muted",
+
+  selectionPopup:
+    "fixed z-[60] w-72 rounded-xl border border-theme-accent/25 bg-theme-bg p-3 shadow-lg backdrop-blur-sm",
+  selectionLabel: "text-caption text-theme-text-muted",
+  colorRow: "mt-2 flex flex-wrap gap-2",
+  colorChip: "h-6 w-6 rounded-full border border-white/60 transition-transform hover:scale-105",
+  popupInput:
+    "mt-2 w-full rounded-lg border border-theme-accent/20 bg-theme-bg px-3 py-2 text-small text-theme-text focus:border-theme-accent focus:outline-none",
+  popupActions: "mt-2 flex items-center justify-end gap-2",
+  popupSave:
+    "rounded-lg bg-theme-accent/10 px-3 py-1 text-caption font-medium text-theme-accent transition-colors hover:bg-theme-accent/20 disabled:opacity-50",
+  popupCancel:
+    "rounded-lg px-3 py-1 text-caption font-medium text-theme-text-muted transition-colors hover:bg-theme-accent/10",
+};
+
+const DEFAULT_INCORRECT_FEEDBACK =
+  "That answer does not match the notes. Review the key concept and try again.";
+
+const colorMarkClass: Record<HighlightColor, string> = {
+  pink: "bg-pink-300/60",
+  orange: "bg-orange-300/60",
+  yellow: "bg-yellow-300/60",
+  green: "bg-green-300/60",
+  blue: "bg-blue-300/60",
+  purple: "bg-purple-300/60",
+};
+
+const colorChipClass: Record<HighlightColor, string> = {
+  pink: "bg-pink-400",
+  orange: "bg-orange-400",
+  yellow: "bg-yellow-400",
+  green: "bg-green-400",
+  blue: "bg-blue-400",
+  purple: "bg-purple-400",
+};
+
+function normalizeQuizFeedback(rawFeedback: unknown, correct: boolean): string {
+  if (typeof rawFeedback !== "string") {
+    return correct ? "Nice work. Your answer matches the notes." : DEFAULT_INCORRECT_FEEDBACK;
+  }
+  const text = rawFeedback.trim();
+  if (!text) return correct ? "Nice work. Your answer matches the notes." : DEFAULT_INCORRECT_FEEDBACK;
+  if ((text.startsWith("{") || text.startsWith("[")) && !correct) return DEFAULT_INCORRECT_FEEDBACK;
+  return text;
+}
+
 function parseSections(content: string): CornellSections {
   const sections: CornellSections = {
     keywords: "",
@@ -31,7 +149,6 @@ function parseSections(content: string): CornellSections {
     notes: "",
     summary: "",
   };
-
   const sectionPattern = /^## (Keywords|Questions|Notes|Summary)\s*$/im;
   const lines = content.split("\n");
   let current: keyof CornellSections | null = null;
@@ -39,19 +156,15 @@ function parseSections(content: string): CornellSections {
   for (const line of lines) {
     const match = line.match(sectionPattern);
     if (match) {
-      const label = match[1].toLowerCase() as keyof CornellSections;
-      current = label;
+      current = match[1].toLowerCase() as keyof CornellSections;
       continue;
     }
-    if (current) {
-      sections[current] += line + "\n";
-    }
+    if (current) sections[current] += `${line}\n`;
   }
 
-  for (const key of Object.keys(sections) as (keyof CornellSections)[]) {
+  (Object.keys(sections) as (keyof CornellSections)[]).forEach((key) => {
     sections[key] = sections[key].trim();
-  }
-
+  });
   return sections;
 }
 
@@ -67,9 +180,9 @@ function rebuildContent(sections: CornellSections): string {
 function parseQuestions(text: string): string[] {
   return text
     .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith("- ") || l.startsWith("* "))
-    .map((l) => l.slice(2).trim())
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("- ") || line.startsWith("* "))
+    .map((line) => line.slice(2).trim())
     .filter(Boolean);
 }
 
@@ -78,138 +191,103 @@ function renderInlineFormatting(text: string) {
   const regex = /\*\*(.+?)\*\*/g;
   let last = 0;
   let match: RegExpExecArray | null;
-
   while ((match = regex.exec(text)) !== null) {
-    if (match.index > last) {
-      parts.push(text.slice(last, match.index));
-    }
+    if (match.index > last) parts.push(text.slice(last, match.index));
     parts.push(
-      <strong key={match.index} className="font-bold text-theme-text">
+      <strong key={`${match.index}-${match[1]}`} className={styles.inlineStrong}>
         {match[1]}
       </strong>
     );
     last = match.index + match[0].length;
   }
-  if (last < text.length) {
-    parts.push(text.slice(last));
-  }
+  if (last < text.length) parts.push(text.slice(last));
   return parts.length > 0 ? parts : text;
 }
 
-// --- Keywords renderer: grouped by topic with bold terms + definitions ---
+function findHighlightsInText(text: string, entries: NotepadEntry[]) {
+  const matches: { start: number; end: number; entry: NotepadEntry }[] = [];
+  const lower = text.toLowerCase();
+  for (const entry of entries) {
+    const query = entry.text.trim().toLowerCase();
+    if (!query) continue;
+    let from = 0;
+    while (from < lower.length) {
+      const idx = lower.indexOf(query, from);
+      if (idx === -1) break;
+      matches.push({ start: idx, end: idx + query.length, entry });
+      from = idx + query.length;
+    }
+  }
+  matches.sort((a, b) => a.start - b.start || b.end - a.end);
+  const merged: typeof matches = [];
+  for (const match of matches) {
+    const last = merged[merged.length - 1];
+    if (!last || match.start >= last.end) merged.push(match);
+  }
+  return merged;
+}
+
+function renderHighlightedText(text: string, entries: NotepadEntry[]) {
+  if (entries.length === 0) return renderInlineFormatting(text);
+  const matches = findHighlightsInText(text, entries);
+  if (matches.length === 0) return renderInlineFormatting(text);
+
+  const nodes: React.ReactNode[] = [];
+  let cursor = 0;
+  matches.forEach((match, index) => {
+    if (match.start > cursor) {
+      nodes.push(text.slice(cursor, match.start));
+    }
+    nodes.push(
+      <mark
+        key={`${match.entry.id}-${index}`}
+        className={`rounded px-1 ${colorMarkClass[match.entry.color]}`}
+        title={match.entry.note || undefined}
+      >
+        {text.slice(match.start, match.end)}
+      </mark>
+    );
+    cursor = match.end;
+  });
+  if (cursor < text.length) nodes.push(text.slice(cursor));
+  return nodes;
+}
 
 function KeywordsContent({ text }: { text: string }) {
-  const lines = text.split("\n");
-  const elements: React.ReactNode[] = [];
-
-  lines.forEach((line, i) => {
-    const trimmed = line.trim();
-    if (trimmed.startsWith("### ")) {
-      elements.push(
-        <h4 key={i} className="text-sm font-bold uppercase tracking-wider text-theme-accent mt-4 mb-2 first:mt-0">
-          {trimmed.slice(4)}
-        </h4>
-      );
-    } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      const content = trimmed.slice(2);
-      const dashIdx = content.indexOf(" -- ");
-      if (dashIdx !== -1) {
-        const term = content.slice(0, dashIdx);
-        const def = content.slice(dashIdx + 4);
-        elements.push(
-          <div key={i} className="mb-2 ml-1">
-            <span className="text-lg font-bold text-theme-text">
-              {renderInlineFormatting(term)}
-            </span>
-            <p className="text-sm text-theme-text-muted leading-snug mt-0.5">{def}</p>
-          </div>
-        );
-      } else {
-        elements.push(
-          <div key={i} className="mb-2 ml-1">
-            <span className="text-lg font-bold text-theme-text">
-              {renderInlineFormatting(content)}
-            </span>
-          </div>
-        );
-      }
-    } else if (trimmed !== "") {
-      elements.push(
-        <p key={i} className="text-base text-theme-text">{trimmed}</p>
-      );
-    }
-  });
-
-  return <>{elements}</>;
-}
-
-// --- Notes renderer: subheadings, numbered lists, nested sub-points ---
-
-function NotesContent({ text }: { text: string }) {
-  const lines = text.split("\n");
-  const elements: React.ReactNode[] = [];
-
-  lines.forEach((line, i) => {
-    const trimmed = line.trim();
-    const indent = line.length - line.trimStart().length;
-
-    if (trimmed.startsWith("### ")) {
-      elements.push(
-        <h4 key={i} className="text-lg font-serif font-bold text-theme-text mt-5 mb-2 first:mt-0">
-          {trimmed.slice(4)}
-        </h4>
-      );
-    } else if (/^\d+\.\s/.test(trimmed)) {
-      const content = trimmed.replace(/^\d+\.\s*/, "");
-      elements.push(
-        <li key={i} className="ml-5 list-decimal text-base leading-relaxed text-theme-text font-medium">
-          {renderInlineFormatting(content)}
-        </li>
-      );
-    } else if ((trimmed.startsWith("- ") || trimmed.startsWith("* ")) && indent >= 2) {
-      elements.push(
-        <li key={i} className="ml-10 list-disc text-sm leading-relaxed text-theme-text-muted">
-          {renderInlineFormatting(trimmed.slice(2))}
-        </li>
-      );
-    } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      elements.push(
-        <li key={i} className="ml-5 list-disc text-base leading-relaxed text-theme-text">
-          {renderInlineFormatting(trimmed.slice(2))}
-        </li>
-      );
-    } else if (trimmed === "") {
-      elements.push(<div key={i} className="h-2" />);
-    } else {
-      elements.push(
-        <p key={i} className="text-base leading-relaxed text-theme-text">
-          {renderInlineFormatting(trimmed)}
-        </p>
-      );
-    }
-  });
-
-  return <>{elements}</>;
-}
-
-// --- Simple section content for Summary ---
-
-function SectionContent({ text }: { text: string }) {
   const lines = text.split("\n");
   return (
     <>
       {lines.map((line, i) => {
-        const trimmed = line.trimStart();
-        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("### ")) {
           return (
-            <li key={i} className="ml-4 list-disc text-base leading-relaxed text-theme-text">
-              {trimmed.slice(2)}
-            </li>
+            <h4 key={i} className={styles.keywordsSubheading}>
+              {trimmed.slice(4)}
+            </h4>
           );
         }
-        if (trimmed === "") return <br key={i} />;
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          const content = trimmed.slice(2);
+          const splitIdx = content.indexOf(" -- ");
+          if (splitIdx !== -1) {
+            return (
+              <div key={i} className={styles.keywordBlock}>
+                <span className={styles.keywordTerm}>
+                  {renderInlineFormatting(content.slice(0, splitIdx))}
+                </span>
+                <p className={styles.keywordDefinition}>{content.slice(splitIdx + 4)}</p>
+              </div>
+            );
+          }
+          return (
+            <div key={i} className={styles.keywordBlock}>
+              <span className={styles.keywordTerm}>{renderInlineFormatting(content)}</span>
+            </div>
+          );
+        }
+        if (!trimmed) return null;
         return (
-          <p key={i} className="text-base leading-relaxed text-theme-text">
+          <p key={i} className={styles.keywordsParagraph}>
             {trimmed}
           </p>
         );
@@ -218,7 +296,74 @@ function SectionContent({ text }: { text: string }) {
   );
 }
 
-// --- Interactive Questions ---
+function NotesContent({ text, highlights }: { text: string; highlights: NotepadEntry[] }) {
+  const lines = text.split("\n");
+  return (
+    <>
+      {lines.map((line, i) => {
+        const trimmed = line.trim();
+        const indent = line.length - line.trimStart().length;
+        if (trimmed.startsWith("### ")) {
+          return (
+            <h4 key={i} className={styles.notesSubheading}>
+              {trimmed.slice(4)}
+            </h4>
+          );
+        }
+        if (/^\d+\.\s/.test(trimmed)) {
+          return (
+            <li key={i} className={styles.notesListNumbered}>
+              {renderHighlightedText(trimmed.replace(/^\d+\.\s*/, ""), highlights)}
+            </li>
+          );
+        }
+        if ((trimmed.startsWith("- ") || trimmed.startsWith("* ")) && indent >= 2) {
+          return (
+            <li key={i} className={styles.notesListNested}>
+              {renderHighlightedText(trimmed.slice(2), highlights)}
+            </li>
+          );
+        }
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          return (
+            <li key={i} className={styles.notesListBullet}>
+              {renderHighlightedText(trimmed.slice(2), highlights)}
+            </li>
+          );
+        }
+        if (!trimmed) return <div key={i} className={styles.notesSpacer} />;
+        return (
+          <p key={i} className={styles.notesParagraph}>
+            {renderHighlightedText(trimmed, highlights)}
+          </p>
+        );
+      })}
+    </>
+  );
+}
+
+function SectionContent({ text }: { text: string }) {
+  return (
+    <>
+      {text.split("\n").map((line, i) => {
+        const trimmed = line.trimStart();
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          return (
+            <li key={i} className={styles.sectionListItem}>
+              {trimmed.slice(2)}
+            </li>
+          );
+        }
+        if (!trimmed) return <br key={i} />;
+        return (
+          <p key={i} className={styles.sectionParagraph}>
+            {trimmed}
+          </p>
+        );
+      })}
+    </>
+  );
+}
 
 function InteractiveQuestions({
   questions,
@@ -227,47 +372,38 @@ function InteractiveQuestions({
   questions: string[];
   notesContext: string;
 }) {
-  const [answers, setAnswers] = useState<QuizAnswer[]>(() =>
-    questions.map(() => ({
-      answer: "",
-      checked: false,
-      loading: false,
-      correct: false,
-      feedback: "",
-    }))
+  const [answers, setAnswers] = useState<QuizAnswer[]>(
+    questions.map(() => ({ answer: "", checked: false, loading: false, correct: false, feedback: "" }))
   );
 
-  async function checkAnswer(idx: number) {
-    const q = questions[idx];
-    const a = answers[idx];
-    if (!a.answer.trim()) return;
-
-    setAnswers((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, loading: true } : item))
+  useEffect(() => {
+    setAnswers(
+      questions.map(() => ({ answer: "", checked: false, loading: false, correct: false, feedback: "" }))
     );
+  }, [questions]);
 
+  async function checkAnswer(idx: number) {
+    const current = answers[idx];
+    if (!current?.answer.trim()) return;
+
+    setAnswers((prev) => prev.map((item, i) => (i === idx ? { ...item, loading: true } : item)));
     try {
       const res = await fetch("/api/ai/check-answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          question: q,
-          answer: a.answer,
+          question: questions[idx],
+          answer: current.answer,
           context: notesContext,
         }),
       });
-      const data = await res.json();
+      if (!res.ok) throw new Error("Failed to check answer");
+      const data = (await res.json()) as { correct?: boolean; feedback?: unknown };
+      const correct = !!data.correct;
+      const feedback = normalizeQuizFeedback(data.feedback, correct);
       setAnswers((prev) =>
         prev.map((item, i) =>
-          i === idx
-            ? {
-                ...item,
-                checked: true,
-                loading: false,
-                correct: !!data.correct,
-                feedback: data.feedback || "",
-              }
-            : item
+          i === idx ? { ...item, checked: true, loading: false, correct, feedback } : item
         )
       );
     } catch {
@@ -279,7 +415,7 @@ function InteractiveQuestions({
                 checked: true,
                 loading: false,
                 correct: false,
-                feedback: "Failed to check answer.",
+                feedback: "Could not verify answer. Please try again.",
               }
             : item
         )
@@ -287,61 +423,38 @@ function InteractiveQuestions({
     }
   }
 
-  function resetQuiz() {
-    setAnswers(
-      questions.map(() => ({
-        answer: "",
-        checked: false,
-        loading: false,
-        correct: false,
-        feedback: "",
-      }))
-    );
-  }
-
-  const checkedCount = answers.filter((a) => a.checked).length;
-  const correctCount = answers.filter((a) => a.checked && a.correct).length;
-
   return (
-    <div className="space-y-4">
-      {questions.map((q, i) => (
-        <div key={i} className="space-y-1.5">
-          <p className="text-base font-medium text-theme-text">{q}</p>
-          <div className="flex gap-2">
+    <div className={styles.quizRoot}>
+      {questions.map((question, i) => (
+        <div key={i} className={styles.quizQuestionBlock}>
+          <p className={styles.quizQuestionText}>{question}</p>
+          <div className={styles.quizInputRow}>
             <input
               type="text"
-              value={answers[i].answer}
+              value={answers[i]?.answer ?? ""}
               onChange={(e) =>
                 setAnswers((prev) =>
-                  prev.map((item, j) =>
-                    j === i ? { ...item, answer: e.target.value, checked: false } : item
-                  )
+                  prev.map((item, j) => (j === i ? { ...item, answer: e.target.value, checked: false } : item))
                 )
               }
-              disabled={answers[i].loading}
+              disabled={answers[i]?.loading}
               placeholder="Type your answer..."
-              className="flex-1 rounded-lg px-3 py-1.5 bg-theme-bg border border-theme-accent/20 text-theme-text text-sm focus:outline-none focus:border-theme-accent disabled:opacity-50"
+              className={styles.quizInput}
               onKeyDown={(e) => {
                 if (e.key === "Enter") checkAnswer(i);
               }}
             />
             <button
               onClick={() => checkAnswer(i)}
-              disabled={answers[i].loading || !answers[i].answer.trim()}
-              className="px-3 py-1.5 rounded-lg bg-theme-accent/10 text-theme-accent text-xs font-medium hover:bg-theme-accent/20 transition-colors disabled:opacity-50"
+              disabled={answers[i]?.loading || !answers[i]?.answer.trim()}
+              className={styles.quizCheckButton}
             >
-              {answers[i].loading ? "..." : "Check"}
+              {answers[i]?.loading ? "..." : "Check"}
             </button>
           </div>
-          {answers[i].checked && (
-            <div
-              className={`rounded-lg px-3 py-2 text-sm ${
-                answers[i].correct
-                  ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                  : "bg-red-500/10 text-red-600 dark:text-red-400"
-              }`}
-            >
-              <span className="font-medium">
+          {answers[i]?.checked && (
+            <div className={answers[i].correct ? styles.quizFeedbackCorrect : styles.quizFeedbackIncorrect}>
+              <span className={styles.quizFeedbackLabel}>
                 {answers[i].correct ? "Correct!" : "Incorrect."}
               </span>{" "}
               {answers[i].feedback}
@@ -349,17 +462,18 @@ function InteractiveQuestions({
           )}
         </div>
       ))}
-
       {questions.length > 0 && (
-        <div className="flex items-center justify-between pt-2 border-t border-theme-accent/10">
-          {checkedCount > 0 && (
-            <span className="text-sm text-theme-text-muted">
-              {correctCount}/{checkedCount} correct
-            </span>
-          )}
+        <div className={styles.quizFooter}>
+          <span className={styles.quizScore}>
+            {answers.filter((a) => a.checked && a.correct).length}/{answers.filter((a) => a.checked).length} correct
+          </span>
           <button
-            onClick={resetQuiz}
-            className="text-xs text-theme-accent hover:underline ml-auto"
+            onClick={() =>
+              setAnswers(
+                questions.map(() => ({ answer: "", checked: false, loading: false, correct: false, feedback: "" }))
+              )
+            }
+            className={styles.quizResetButton}
           >
             Reset Quiz
           </button>
@@ -369,14 +483,55 @@ function InteractiveQuestions({
   );
 }
 
-// --- Main component ---
-
-export function CornellRenderer({ title, date, content, onSave }: CornellRendererProps) {
+export function CornellRenderer({
+  guideId,
+  guideTitle,
+  title,
+  date,
+  content,
+  notepadEntries,
+  onSave,
+  onCreateNotepadEntry,
+}: CornellRendererProps) {
   const [sections, setSections] = useState(() => parseSections(content));
   const [editing, setEditing] = useState<keyof CornellSections | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [selectedText, setSelectedText] = useState("");
+  const [selectedColor, setSelectedColor] = useState<HighlightColor>("yellow");
+  const [selectionNote, setSelectionNote] = useState("");
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number } | null>(null);
 
-  const questions = parseQuestions(sections.questions);
+  const notesAreaRef = useRef<HTMLDivElement | null>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
+  const questions = useMemo(() => parseQuestions(sections.questions), [sections.questions]);
+  const guideEntries = useMemo(
+    () => notepadEntries.filter((entry) => (guideId ? entry.guideId === guideId : false)),
+    [guideId, notepadEntries]
+  );
+
+  useEffect(() => {
+    setSections(parseSections(content));
+    setEditing(null);
+    setEditValue("");
+  }, [content]);
+
+  useEffect(() => {
+    function onDocMouseDown(event: MouseEvent) {
+      if (!popupPos) return;
+      const target = event.target as Node;
+      if (popupRef.current?.contains(target)) return;
+      setPopupPos(null);
+    }
+    function onEsc(event: KeyboardEvent) {
+      if (event.key === "Escape") setPopupPos(null);
+    }
+    document.addEventListener("mousedown", onDocMouseDown);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDocMouseDown);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [popupPos]);
 
   function startEdit(section: keyof CornellSections) {
     setEditing(section);
@@ -397,113 +552,173 @@ export function CornellRenderer({ title, date, content, onSave }: CornellRendere
     setEditValue("");
   }
 
-  const formatDate = (iso: string) => {
-    try {
-      return new Date(iso).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    } catch {
-      return iso;
-    }
-  };
+  function captureSelection() {
+    if (!notesAreaRef.current || editing === "notes") return;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
+    const range = selection.getRangeAt(0);
+    const container = range.commonAncestorContainer;
+    if (!notesAreaRef.current.contains(container)) return;
 
-  const sectionLabel = "font-serif text-lg font-semibold text-theme-accent mb-2";
-  const editBtn =
-    "ml-2 text-xs text-theme-accent hover:underline opacity-0 group-hover:opacity-100 transition-opacity";
+    const text = selection.toString().replace(/\s+/g, " ").trim();
+    if (!text) return;
+
+    const rect = range.getBoundingClientRect();
+    setSelectedText(text);
+    setSelectionNote("");
+    setPopupPos({
+      top: Math.max(16, rect.top - 12),
+      left: Math.min(window.innerWidth - 180, Math.max(16, rect.left + rect.width / 2)),
+    });
+  }
+
+  async function saveSelectedHighlight() {
+    if (!selectedText || !onCreateNotepadEntry) return;
+    await onCreateNotepadEntry(selectedText, selectedColor, selectionNote);
+    setPopupPos(null);
+    setSelectionNote("");
+    window.getSelection()?.removeAllRanges();
+  }
+
+  const formattedDate = (() => {
+    try {
+      return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    } catch {
+      return date;
+    }
+  })();
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden">
-      {/* Header: Title + Date */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-theme-accent/20">
+    <div className={styles.cardRoot}>
+      <div className={styles.header}>
         <div>
-          <h2 className="font-serif text-2xl font-bold text-theme-text">{title}</h2>
-          <div className="mt-1 h-1 w-20 rounded-full bg-theme-accent/40" />
+          <h2 className={styles.headerTitle}>{title}</h2>
+          <div className={styles.headerTitleUnderline} />
         </div>
-        <span className="text-sm text-theme-text-muted italic">{formatDate(date)}</span>
+        <span className={styles.headerDate}>{formattedDate}</span>
       </div>
 
-      {/* Two-column body */}
-      <div className="grid grid-cols-[1fr_3fr] min-h-[300px]">
-        {/* Left column */}
-        <div className="border-r border-theme-accent/20 flex flex-col">
-          {/* Keywords */}
-          <div className="group p-4 flex-1 border-b border-theme-accent/20">
-            <div className="flex items-center">
-              <h3 className={sectionLabel}>Keywords</h3>
-              {editing !== "keywords" && (
-                <button onClick={() => startEdit("keywords")} className={editBtn}>
-                  Edit
-                </button>
+      <div className={styles.bodyStack}>
+        <div className={styles.cornellFrame}>
+          <div className={styles.cornellTop}>
+            <div className={styles.cornellCueColumn}>
+              <h3 className={styles.cornellTitle}>Cue column</h3>
+              <div className={styles.sectionHeaderRow}>
+                <h4 className={styles.cornellSubTitle}>Key words</h4>
+                {editing !== "keywords" && (
+                  <button onClick={() => startEdit("keywords")} className={styles.editButton}>
+                    Edit
+                  </button>
+                )}
+              </div>
+              {editing === "keywords" ? (
+                <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
+              ) : (
+                <KeywordsContent text={sections.keywords} />
+              )}
+
+              <div className={styles.sectionHeaderRow}>
+                <h4 className={styles.cornellSubTitle}>Key questions</h4>
+                {editing !== "questions" && (
+                  <button onClick={() => startEdit("questions")} className={styles.editButton}>
+                    Edit
+                  </button>
+                )}
+              </div>
+              {editing === "questions" ? (
+                <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
+              ) : (
+                <InteractiveQuestions questions={questions} notesContext={sections.notes} />
               )}
             </div>
-            {editing === "keywords" ? (
-              <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
-            ) : (
-              <KeywordsContent text={sections.keywords} />
-            )}
+
+            <div ref={notesAreaRef} className={styles.cornellNotesColumn} onMouseUp={captureSelection}>
+              <div className={styles.sectionHeaderRow}>
+                <h3 className={styles.cornellTitle}>Note-taking column</h3>
+                {editing !== "notes" && (
+                  <button onClick={() => startEdit("notes")} className={styles.editButton}>
+                    Edit
+                  </button>
+                )}
+              </div>
+              <p className={styles.sectionParagraph}>Source: {guideTitle}</p>
+              {editing === "notes" ? (
+                <EditArea
+                  value={editValue}
+                  onChange={setEditValue}
+                  onSave={saveEdit}
+                  onCancel={cancelEdit}
+                  rows={12}
+                />
+              ) : (
+                <NotesContent text={sections.notes} highlights={guideEntries} />
+              )}
+            </div>
           </div>
 
-          {/* Questions */}
-          <div className="group p-4 flex-1">
-            <div className="flex items-center">
-              <h3 className={sectionLabel}>Questions</h3>
-              {editing !== "questions" && (
-                <button onClick={() => startEdit("questions")} className={editBtn}>
+          <div className={styles.cornellSummaryRow}>
+            <div className={styles.sectionHeaderRow}>
+              <h3 className={styles.cornellTitle}>Summary</h3>
+              {editing !== "summary" && (
+                <button onClick={() => startEdit("summary")} className={styles.editButton}>
                   Edit
                 </button>
               )}
             </div>
-            {editing === "questions" ? (
-              <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
-            ) : (
-              <InteractiveQuestions
-                questions={questions}
-                notesContext={sections.notes}
+            <div className={styles.summaryContent}>
+              {editing === "summary" ? (
+                <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} rows={3} />
+              ) : (
+                <SectionContent text={sections.summary} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {popupPos && (
+        <div
+          ref={popupRef}
+          className={styles.selectionPopup}
+          style={{ top: popupPos.top, left: popupPos.left, transform: "translate(-50%, -100%)" }}
+        >
+          <p className={styles.selectionLabel}>Save highlighted text</p>
+          <p className={styles.sectionParagraph}>{selectedText}</p>
+          <div className={styles.colorRow}>
+            {(Object.keys(colorChipClass) as HighlightColor[]).map((color) => (
+              <button
+                key={color}
+                type="button"
+                aria-label={`Set color ${color}`}
+                className={`${styles.colorChip} ${colorChipClass[color]} ${
+                  selectedColor === color ? "ring-2 ring-theme-accent" : ""
+                }`}
+                onClick={() => setSelectedColor(color)}
               />
-            )}
+            ))}
           </div>
-        </div>
-
-        {/* Right column: Notes */}
-        <div className="group p-5">
-          <div className="flex items-center">
-            <h3 className={sectionLabel}>Notes</h3>
-            {editing !== "notes" && (
-              <button onClick={() => startEdit("notes")} className={editBtn}>
-                Edit
-              </button>
-            )}
-          </div>
-          {editing === "notes" ? (
-            <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} rows={12} />
-          ) : (
-            <NotesContent text={sections.notes} />
-          )}
-        </div>
-      </div>
-
-      {/* Summary footer */}
-      <div className="group border-t border-theme-accent/20 px-6 py-4">
-        <div className="flex items-center">
-          <h3 className="font-serif text-xl font-bold text-theme-text tracking-wide uppercase">
-            Summary
-          </h3>
-          {editing !== "summary" && (
-            <button onClick={() => startEdit("summary")} className={editBtn}>
-              Edit
+          <textarea
+            value={selectionNote}
+            onChange={(e) => setSelectionNote(e.target.value)}
+            rows={2}
+            placeholder="Optional note..."
+            className={styles.popupInput}
+          />
+          <div className={styles.popupActions}>
+            <button type="button" className={styles.popupCancel} onClick={() => setPopupPos(null)}>
+              Cancel
             </button>
-          )}
+            <button
+              type="button"
+              className={styles.popupSave}
+              onClick={saveSelectedHighlight}
+              disabled={!selectedText || !onCreateNotepadEntry}
+            >
+              Save
+            </button>
+          </div>
         </div>
-        <div className="mt-2">
-          {editing === "summary" ? (
-            <EditArea value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} rows={3} />
-          ) : (
-            <SectionContent text={sections.summary} />
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -522,24 +737,13 @@ function EditArea({
   rows?: number;
 }) {
   return (
-    <div className="space-y-2">
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={rows}
-        className="w-full rounded-lg px-3 py-2 bg-theme-bg border border-theme-accent/20 text-theme-text text-base focus:outline-none focus:border-theme-accent resize-y"
-      />
-      <div className="flex gap-2">
-        <button
-          onClick={onSave}
-          className="px-3 py-1 rounded-lg bg-theme-accent/10 text-theme-accent text-xs font-medium hover:bg-theme-accent/20 transition-colors"
-        >
+    <div className={styles.editAreaRoot}>
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={rows} className={styles.editTextarea} />
+      <div className={styles.editActions}>
+        <button onClick={onSave} className={styles.editSaveButton}>
           Save
         </button>
-        <button
-          onClick={onCancel}
-          className="px-3 py-1 rounded-lg text-theme-text-muted text-xs font-medium hover:bg-theme-accent/10 transition-colors"
-        >
+        <button onClick={onCancel} className={styles.editCancelButton}>
           Cancel
         </button>
       </div>

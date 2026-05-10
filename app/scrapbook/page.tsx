@@ -1,12 +1,5 @@
-import { ScrapbookCanvas } from "@/components/scrapbook/scrapbook-canvas";
+import { redirect } from "next/navigation";
 
 export default function ScrapbookPage() {
-  return (
-    <div className="space-y-4">
-      <h1 className="font-serif text-3xl text-theme-text">Scrapbook</h1>
-      <ScrapbookCanvas pageId="scrapbook">
-        <div className="min-h-[60vh]" />
-      </ScrapbookCanvas>
-    </div>
-  );
+  redirect("/whiteboard");
 }
