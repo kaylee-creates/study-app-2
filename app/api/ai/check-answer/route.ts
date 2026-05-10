@@ -9,6 +9,34 @@ interface RequestBody {
   context: string;
 }
 
+const DEFAULT_INCORRECT_FEEDBACK =
+  "That answer does not match the notes. Review the key concept and try again.";
+
+function normalizeFeedback(raw: string): string {
+  const cleaned = raw.replace(/^```json?\s*/i, "").replace(/```\s*$/i, "").trim();
+  if (!cleaned) return DEFAULT_INCORRECT_FEEDBACK;
+
+  try {
+    const parsed = JSON.parse(cleaned) as { feedback?: string };
+    if (typeof parsed.feedback === "string" && parsed.feedback.trim()) {
+      return parsed.feedback.trim();
+    }
+  } catch {
+    // Fall through to best-effort text extraction.
+  }
+
+  const feedbackMatch = cleaned.match(/"feedback"\s*:\s*"([^"]+)"/i);
+  if (feedbackMatch?.[1]) {
+    return feedbackMatch[1].trim();
+  }
+
+  if (cleaned.startsWith("{") || cleaned.startsWith("[")) {
+    return DEFAULT_INCORRECT_FEEDBACK;
+  }
+
+  return cleaned.slice(0, 220);
+}
+
 export async function POST(request: Request) {
   let body: RequestBody;
   try {
@@ -37,12 +65,14 @@ export async function POST(request: Request) {
         };
         return NextResponse.json({
           correct: !!parsed.correct,
-          feedback: parsed.feedback || "",
+          feedback:
+            (typeof parsed.feedback === "string" && parsed.feedback.trim()) ||
+            (parsed.correct ? "Nice work. Your answer matches the notes." : DEFAULT_INCORRECT_FEEDBACK),
         });
       } catch {
         return NextResponse.json({
           correct: false,
-          feedback: raw || "Could not evaluate answer.",
+          feedback: normalizeFeedback(raw),
         });
       }
     } catch (e) {

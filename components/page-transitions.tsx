@@ -4,6 +4,12 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { WelcomeModal } from "@/components/welcome-modal";
 
+const styles = {
+  loadingShell: "min-h-screen",
+  blurOverlay:
+    "fixed inset-0 z-[90] pointer-events-none transition-all duration-[1200ms] ease-out",
+};
+
 export function PageTransitions({ children }: { children: React.ReactNode }) {
   const { settings, isLoaded } = useTheme();
   const [showWelcome, setShowWelcome] = useState(false);
@@ -41,7 +47,7 @@ export function PageTransitions({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!isLoaded || !welcomeCheckDone) {
-    return <div className="min-h-screen" style={{ background: "transparent" }} />;
+    return <div className={styles.loadingShell} style={{ background: "transparent" }} />;
   }
 
   return (
@@ -50,7 +56,7 @@ export function PageTransitions({ children }: { children: React.ReactNode }) {
 
       {/* Blur-to-clear overlay */}
       <div
-        className="fixed inset-0 z-[90] pointer-events-none transition-all duration-[1200ms] ease-out"
+        className={styles.blurOverlay}
         style={{
           backdropFilter: blurActive ? "blur(20px)" : "blur(0px)",
           WebkitBackdropFilter: blurActive ? "blur(20px)" : "blur(0px)",

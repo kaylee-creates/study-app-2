@@ -12,6 +12,23 @@ interface DashboardStats {
   upcomingPlanCount: number;
 }
 
+const styles = {
+  skeletonRoot: "scrapbook-page min-h-[40vh] animate-pulse rounded-lg p-6",
+  skeletonTitle: "mb-6 h-8 w-48 rounded bg-theme-surface",
+  skeletonGrid: "grid gap-4 md:grid-cols-2",
+  skeletonCard: "h-24 rounded-lg bg-theme-surface",
+  root: "space-y-6",
+  pageTitle: "font-serif text-page-title text-theme-text",
+  statsGrid: "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+  cardHeader: "pb-2",
+  cardTitle: "text-small font-medium text-theme-text-muted",
+  statPrimary: "text-2xl font-semibold text-theme-accent",
+  statSecondary: "text-2xl font-semibold text-theme-accent-dark",
+  statNeutral: "text-2xl font-semibold text-theme-text",
+  statUnit: "text-body font-normal text-theme-text-muted",
+  actions: "flex flex-wrap gap-3",
+};
+
 export function DashboardContent() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
@@ -42,61 +59,61 @@ export function DashboardContent() {
 
   if (stats === null) {
     return (
-      <div className="scrapbook-page min-h-[40vh] rounded-lg p-6 animate-pulse">
-        <div className="h-8 w-48 bg-cozy-grid rounded mb-6" />
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="h-24 bg-cozy-grid rounded-lg" />
-          <div className="h-24 bg-cozy-grid rounded-lg" />
+      <div className={styles.skeletonRoot}>
+        <div className={styles.skeletonTitle} />
+        <div className={styles.skeletonGrid}>
+          <div className={styles.skeletonCard} />
+          <div className={styles.skeletonCard} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-handwritten text-3xl text-cozy-ink">Dashboard</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className={styles.root}>
+      <h1 className={styles.pageTitle}>Dashboard</h1>
+      <div className={styles.statsGrid}>
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-cozy-muted">
+          <CardHeader className={styles.cardHeader}>
+            <CardTitle className={styles.cardTitle}>
               Today&apos;s focus
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-cozy-clover">
+            <p className={styles.statPrimary}>
               {stats.todayMinutes}
-              <span className="text-base font-normal text-cozy-muted"> min</span>
+              <span className={styles.statUnit}> min</span>
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-cozy-muted">
+          <CardHeader className={styles.cardHeader}>
+            <CardTitle className={styles.cardTitle}>
               Today&apos;s points
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-cozy-terracotta">
+            <p className={styles.statSecondary}>
               {stats.todayPoints}
-              <span className="text-base font-normal text-cozy-muted"> pts</span>
+              <span className={styles.statUnit}> pts</span>
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-cozy-muted">
+          <CardHeader className={styles.cardHeader}>
+            <CardTitle className={styles.cardTitle}>
               Upcoming
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-cozy-ink">
+            <p className={styles.statNeutral}>
               {stats.upcomingPlanCount}
-              <span className="text-base font-normal text-cozy-muted"> tasks</span>
+              <span className={styles.statUnit}> tasks</span>
             </p>
           </CardContent>
         </Card>
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className={styles.actions}>
         <Button asChild>
           <Link href="/pomodoro">Start Pomodoro</Link>
         </Button>

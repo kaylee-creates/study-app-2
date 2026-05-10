@@ -6,6 +6,47 @@ import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { extractYoutubeVideoId } from "@/lib/themes";
 
+const styles = {
+  root: "mx-auto max-w-md space-y-8 pt-4",
+  titleBlock: "text-center",
+  title: "font-cursive text-7xl text-theme-text sm:text-8xl",
+  surfaceCard: "space-y-6 rounded-2xl border-2 p-6",
+  profileSection: "space-y-2",
+  label: "font-serif text-card-title text-theme-text-muted",
+  nameForm: "flex gap-2",
+  nameInput:
+    "flex-1 rounded-xl border border-theme-accent/30 bg-white/80 px-4 py-2.5 text-body text-theme-text placeholder:text-theme-text-muted/50 focus:border-theme-accent focus:outline-none",
+  saveButton:
+    "rounded-xl bg-theme-accent px-4 py-2.5 text-small font-medium text-white transition-transform hover:scale-[1.02]",
+  divider: "h-px bg-white/30",
+  toggleRow: "flex items-center justify-between",
+  toggleLabel: "font-serif text-card-title text-theme-text-muted",
+  toggleButton: "relative",
+  toggleTrack: "h-7 w-14 rounded-full transition-colors",
+  toggleTrackOn: "bg-theme-accent",
+  toggleTrackOff: "bg-theme-accent/40",
+  toggleThumb:
+    "absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform",
+  toggleThumbOn: "translate-x-7",
+  toggleThumbOff: "translate-x-1",
+  musicSection: "space-y-3",
+  musicSubBlock: "space-y-2",
+  musicHint: "text-small text-theme-text/70",
+  musicForm: "flex gap-2",
+  musicInput:
+    "flex-1 rounded-xl border border-theme-accent/20 bg-white/80 px-3 py-2 text-small text-theme-text placeholder:text-theme-text-muted/50 focus:border-theme-accent focus:outline-none",
+  musicResetButton:
+    "rounded-xl bg-white/50 px-3 py-2 text-small text-theme-text-muted",
+  musicPlayButton: "rounded-xl bg-theme-accent px-3 py-2 text-small text-white",
+  shopLink:
+    "flex items-center justify-between rounded-xl px-1 py-2 transition-colors hover:bg-white/10",
+  shopLinkLabel: "font-serif text-card-title text-theme-text-muted",
+  shopLinkMeta: "flex items-center gap-2",
+  shopCoins: "text-small text-theme-text-muted",
+  shopCoinIcon: "mr-1 inline h-4 w-4",
+  shopChevron: "text-theme-text-muted",
+};
+
 export function SettingsContent() {
   const {
     settings,
@@ -35,33 +76,33 @@ export function SettingsContent() {
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-8 pt-4">
+    <div className={styles.root}>
       {/* Title */}
-      <div className="text-center">
-        <h1 className="font-cursive text-7xl sm:text-8xl text-theme-text">settings</h1>
+      <div className={styles.titleBlock}>
+        <h1 className={styles.title}>settings</h1>
       </div>
 
       {/* Green card with pink border */}
       <div
-        className="rounded-2xl p-6 space-y-6 border-2"
+        className={styles.surfaceCard}
         style={{
           background: "var(--color-surface)",
           borderColor: "var(--color-accent)",
         }}
       >
         {/* Profile section */}
-        <div className="space-y-2">
-          <label className="font-serif text-lg text-theme-text-muted">display name</label>
-          <form onSubmit={handleNameSave} className="flex gap-2">
+        <div className={styles.profileSection}>
+          <label className={styles.label}>display name</label>
+          <form onSubmit={handleNameSave} className={styles.nameForm}>
             <input
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
-              className="flex-1 rounded-xl px-4 py-2.5 text-base bg-white/80 border border-theme-accent/30 text-theme-text placeholder:text-theme-text-muted/50 focus:outline-none focus:border-theme-accent"
+              className={styles.nameInput}
               placeholder="Your name"
             />
             <button
               type="submit"
-              className="px-4 py-2.5 rounded-xl bg-theme-accent text-white text-sm font-medium hover:scale-[1.02] transition-transform"
+              className={styles.saveButton}
             >
               Save
             </button>
@@ -69,28 +110,28 @@ export function SettingsContent() {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/30" />
+        <div className={styles.divider} />
 
         {/* Light/Dark mode toggle */}
-        <div className="flex items-center justify-between">
-          <span className="font-serif text-lg text-theme-text-muted">
+        <div className={styles.toggleRow}>
+          <span className={styles.toggleLabel}>
             {settings.darkModeEnabled ? "dark mode" : "light mode"}
           </span>
           <button
             onClick={toggleDarkMode}
-            className="relative"
+            className={styles.toggleButton}
             aria-label="Toggle dark mode"
           >
             <div
               className={cn(
-                "w-14 h-7 rounded-full transition-colors",
-                settings.darkModeEnabled ? "bg-theme-accent" : "bg-theme-accent/40"
+                styles.toggleTrack,
+                settings.darkModeEnabled ? styles.toggleTrackOn : styles.toggleTrackOff
               )}
             >
               <div
                 className={cn(
-                  "absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform",
-                  settings.darkModeEnabled ? "translate-x-7" : "translate-x-1"
+                  styles.toggleThumb,
+                  settings.darkModeEnabled ? styles.toggleThumbOn : styles.toggleThumbOff
                 )}
               />
             </div>
@@ -98,27 +139,27 @@ export function SettingsContent() {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/30" />
+        <div className={styles.divider} />
 
         {/* Background music */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="font-serif text-lg text-theme-text-muted">background music</span>
+        <div className={styles.musicSection}>
+          <div className={styles.toggleRow}>
+            <span className={styles.toggleLabel}>background music</span>
             <button
               onClick={toggleBackgroundMusic}
-              className="relative"
+              className={styles.toggleButton}
               aria-label="Toggle background music"
             >
               <div
                 className={cn(
-                  "w-14 h-7 rounded-full transition-colors",
-                  settings.backgroundMusicEnabled ? "bg-theme-accent" : "bg-theme-accent/40"
+                  styles.toggleTrack,
+                  settings.backgroundMusicEnabled ? styles.toggleTrackOn : styles.toggleTrackOff
                 )}
               >
                 <div
                   className={cn(
-                    "absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform",
-                    settings.backgroundMusicEnabled ? "translate-x-7" : "translate-x-1"
+                    styles.toggleThumb,
+                    settings.backgroundMusicEnabled ? styles.toggleThumbOn : styles.toggleThumbOff
                   )}
                 />
               </div>
@@ -126,27 +167,27 @@ export function SettingsContent() {
           </div>
 
           {settings.backgroundMusicEnabled && (
-            <div className="space-y-2">
-              <p className="text-sm text-theme-text/70">custom YouTube music</p>
-              <form onSubmit={handleMusicUrlSubmit} className="flex gap-2">
+            <div className={styles.musicSubBlock}>
+              <p className={styles.musicHint}>custom YouTube music</p>
+              <form onSubmit={handleMusicUrlSubmit} className={styles.musicForm}>
                 <input
                   value={customUrl}
                   onChange={(e) => setCustomUrl(e.target.value)}
                   placeholder="Paste YouTube URL..."
-                  className="flex-1 rounded-xl px-3 py-2 text-sm bg-white/80 border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50 focus:outline-none focus:border-theme-accent"
+                  className={styles.musicInput}
                 />
                 {musicUrlActive ? (
                   <button
                     type="button"
                     onClick={() => { setMusicUrlActive(false); setCustomUrl(""); }}
-                    className="text-sm px-3 py-2 rounded-xl bg-white/50 text-theme-text-muted"
+                    className={styles.musicResetButton}
                   >
                     Reset
                   </button>
                 ) : (
                   <button
                     type="submit"
-                    className="text-sm px-3 py-2 rounded-xl bg-theme-accent text-white"
+                    className={styles.musicPlayButton}
                   >
                     Play
                   </button>
@@ -157,23 +198,23 @@ export function SettingsContent() {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/30" />
+        <div className={styles.divider} />
 
         {/* Theme Shop link */}
         <Link
           href="/shop"
-          className="flex items-center justify-between py-2 px-1 rounded-xl hover:bg-white/10 transition-colors"
+          className={styles.shopLink}
         >
-          <span className="font-serif text-lg text-theme-text-muted">theme shop</span>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-theme-text-muted">
-              <svg className="inline w-4 h-4 mr-1" viewBox="0 0 20 20" fill="none">
+          <span className={styles.shopLinkLabel}>theme shop</span>
+          <div className={styles.shopLinkMeta}>
+            <span className={styles.shopCoins}>
+              <svg className={styles.shopCoinIcon} viewBox="0 0 20 20" fill="none">
                 <circle cx="10" cy="10" r="9" fill="var(--color-accent-yellow)" opacity="0.8" />
                 <text x="10" y="14" textAnchor="middle" fontSize="10" fill="var(--color-text)" fontWeight="bold">$</text>
               </svg>
               {settings.totalPoints}
             </span>
-            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" className="text-theme-text-muted">
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" className={styles.shopChevron}>
               <path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>

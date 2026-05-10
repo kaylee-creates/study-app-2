@@ -5,7 +5,7 @@ export const maxDuration = 60;
 
 interface StudyGuideRequest {
   content: string;
-  format: "tree" | "cornell" | "mapping";
+  format: "tree" | "cornell" | "questions";
 }
 
 export async function POST(request: Request) {
@@ -23,9 +23,9 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  if (!["tree", "cornell", "mapping"].includes(format)) {
+  if (!["tree", "cornell", "questions"].includes(format)) {
     return NextResponse.json(
-      { error: "format must be tree, cornell, or mapping" },
+      { error: "format must be tree, cornell, or questions" },
       { status: 400 }
     );
   }
@@ -70,9 +70,24 @@ function buildPrompt(content: string, format: string): { prompt: string; system?
         system: `You are a study notes formatter. You MUST output EXACTLY four markdown sections with these EXACT headings: ## Keywords, ## Questions, ## Notes, ## Summary. Do NOT use any other ## headings. Do NOT add a title. Start your response with ## Keywords on the very first line.`,
         prompt: `Here is the source text to convert into Cornell notes:\n\n${truncated}\n\n---\n\nNow format the above text as Cornell method study notes using EXACTLY these four sections. Start with ## Keywords on the first line.\n\n## Keywords\nExtract domain-specific vocabulary — technical terms, concepts, names, jargon. Group by theme using ### subheadings. Each term bold with a short definition:\n### Theme Name\n- **Term** -- definition\n\n## Questions\n5-8 specific factual comprehension questions as bullet points.\n\n## Notes\nOrganize the most important information by conceptual theme. Distill and synthesize — do NOT list every sentence. Use ### subheadings, numbered main points, and indented bullet sub-details. Limit each theme to 1-2 main points with 2-3 details.\n\n## Summary\n2-3 sentence summary of key takeaways.`,
       };
-    case "mapping":
+    case "questions":
       return {
-        prompt: `Convert the following text into a concept mapping study guide. Identify the central concept, then list related concepts as branches. Format as Markdown with:\n## Central Concept\n(The main idea)\n\n## Branches\n(Each branch as a heading with sub-points)\n\nReturn only the formatted content.\n\n${truncated}`,
+        system:
+          "You are a quiz generator. Return valid JSON only, with no markdown and no extra text.",
+        prompt: `Create 8 multiple-choice questions from the source text below.
+
+Return ONLY a JSON array. Each item must have this exact shape:
+{"question":"string","options":["opt1","opt2","opt3","opt4"],"correctIndex":0,"explanation":"string"}
+
+Rules:
+- options must have exactly 4 short answer choices
+- correctIndex must be 0, 1, 2, or 3
+- questions should test key facts from the source text
+- avoid trick questions
+- keep explanations to one sentence
+
+Source text:
+${truncated}`,
       };
     default:
       return { prompt: `Summarize and structure the following text:\n\n${truncated}` };
@@ -285,22 +300,57 @@ function generateFallback(rawContent: string, format: string): string {
       const summary = `## Summary\n\n${sentences.slice(0, 2).join(". ")}.`;
       return `${keywords}\n${questions}\n${notes}\n${summary}`;
     }
-    case "mapping": {
-      let result = `## Central Concept\n\n${sentences[0] || "Main Topic"}\n\n## Branches\n\n`;
-      paragraphs.slice(0, 6).forEach((p, i) => {
-        const firstSentence = p.split(/[.!?]/)[0]?.trim() || `Branch ${i + 1}`;
-        result += `### ${firstSentence}\n\n`;
-        const rest = p
-          .split(/[.!?]+/)
-          .slice(1)
-          .map((s) => s.trim())
-          .filter(Boolean);
-        rest.forEach((s) => {
-          result += `- ${s}\n`;
-        });
-        result += "\n";
+    case "questions": {
+      const pool = sentences.filter((s) => s.length > 24).slice(0, 12);
+      const cards = pool.slice(0, 8).map((sentence, i) => {
+        const lead = sentence.split(/\s+/).slice(0, 6).join(" ");
+        const question = `Which statement best matches: "${lead}"?`;
+
+        const distractorPool = pool.filter((s, idx) => idx !== i).slice(0, 6);
+        const options = [sentence];
+
+        for (const candidate of distractorPool) {
+          if (options.length >= 4) break;
+          if (!options.includes(candidate)) options.push(candidate);
+        }
+
+        while (options.length < 4) {
+          options.push(`This detail is not stated in the source text.`);
+        }
+
+        for (let j = options.length - 1; j > 0; j--) {
+          const k = Math.floor(Math.random() * (j + 1));
+          [options[j], options[k]] = [options[k], options[j]];
+        }
+
+        const correctIndex = options.findIndex((o) => o === sentence);
+
+        return {
+          question,
+          options,
+          correctIndex: correctIndex >= 0 ? correctIndex : 0,
+          explanation: "The correct choice is directly supported by the original notes.",
+        };
       });
-      return result;
+
+      if (cards.length === 0) {
+        const fallback = [
+          {
+            question: "Which statement best summarizes the provided notes?",
+            options: [
+              sentences[0] || "The notes describe a key topic in detail.",
+              "The notes are unrelated to the topic.",
+              "No information is provided in the notes.",
+              "The notes only include opinions without facts.",
+            ],
+            correctIndex: 0,
+            explanation: "The first option reflects the source material.",
+          },
+        ];
+        return JSON.stringify(fallback, null, 2);
+      }
+
+      return JSON.stringify(cards, null, 2);
     }
     default:
       return content.slice(0, 1000);

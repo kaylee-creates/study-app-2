@@ -4,6 +4,52 @@ import { useCallback, useEffect, useState } from "react";
 import { localStudyRepository } from "@/lib/storage-local";
 import type { Flashcard } from "@/lib/domain";
 
+const styles = {
+  root: "space-y-6",
+  titleWrap: "inline-block",
+  pageTitle: "font-serif text-page-title text-theme-text",
+  titleUnderline: "mt-0.5",
+  emptyStateCard: "glass-card rounded-2xl p-8 text-center",
+  mutedBody: "text-body text-theme-text-muted",
+  librarySection: "space-y-4",
+  libraryToolbar: "flex items-center justify-between",
+  cardCount: "text-small text-theme-text-muted",
+  startReviewButton:
+    "glass rounded-xl px-5 py-2 shadow-glass text-small font-medium text-theme-text hover:scale-[1.02] transition-transform",
+  cardList: "space-y-2 max-h-[60vh] overflow-y-auto pr-1",
+  cardRow: "glass-card rounded-xl p-4 space-y-2",
+  editForm: "space-y-2",
+  editInput:
+    "w-full rounded-lg px-3 py-2 bg-theme-bg border border-theme-accent/20 text-theme-text text-small focus:outline-none focus:border-theme-accent",
+  editActions: "flex gap-2",
+  saveButton:
+    "px-3 py-1 rounded-lg bg-theme-accent/10 text-theme-accent text-caption font-medium hover:bg-theme-accent/20 transition-colors",
+  cancelEditButton:
+    "px-3 py-1 rounded-lg text-theme-text-muted text-caption font-medium hover:bg-theme-accent/10 transition-colors",
+  questionText: "text-small font-medium text-theme-text",
+  answerPreview: "text-small text-theme-text-muted line-clamp-2",
+  cardActions: "flex gap-2 pt-1",
+  editButton:
+    "px-3 py-1 rounded-lg text-caption font-medium text-theme-accent hover:bg-theme-accent/10 transition-colors",
+  deleteButton:
+    "px-3 py-1 rounded-lg text-caption font-medium text-red-500 hover:bg-red-500/10 transition-colors",
+  backLink: "text-small text-theme-accent hover:underline",
+  reviewCard: "glass-card rounded-2xl max-w-xl mx-auto p-6 space-y-4",
+  reviewProgress: "text-small text-theme-text-muted",
+  reviewQuestion: "font-serif text-section-title text-theme-text",
+  answerSection: "border-t border-theme-accent/20 pt-4",
+  answerText: "text-body text-theme-text-muted",
+  ratingRow: "flex gap-2 flex-wrap",
+  againButton:
+    "px-4 py-2 rounded-xl text-small font-medium bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors",
+  goodButton:
+    "px-4 py-2 rounded-xl text-small font-medium bg-theme-accent/10 text-theme-accent hover:bg-theme-accent/20 transition-colors",
+  easyButton:
+    "px-4 py-2 rounded-xl text-small font-medium glass shadow-glass text-theme-text hover:scale-[1.02] transition-transform",
+  showAnswerButton:
+    "glass rounded-xl px-6 py-2.5 shadow-glass text-body font-medium text-theme-text hover:scale-[1.02] transition-transform",
+};
+
 export function FlashcardsContent() {
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,23 +131,23 @@ export function FlashcardsContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="inline-block">
-        <h1 className="font-serif text-3xl text-theme-text">Flashcards</h1>
-        <svg className="mt-0.5" width="110" height="8" viewBox="0 0 110 8" fill="none">
+    <div className={styles.root}>
+      <div className={styles.titleWrap}>
+        <h1 className={styles.pageTitle}>Flashcards</h1>
+        <svg className={styles.titleUnderline} width="110" height="8" viewBox="0 0 110 8" fill="none">
           <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 108,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
         </svg>
       </div>
 
       {loading && (
-        <div className="glass-card rounded-2xl p-8 text-center">
-          <p className="text-base text-theme-text-muted">Loading flashcards...</p>
+        <div className={styles.emptyStateCard}>
+          <p className={styles.mutedBody}>Loading flashcards...</p>
         </div>
       )}
 
       {!loading && !hasCards && (
-        <div className="glass-card rounded-2xl p-8 text-center">
-          <p className="text-base text-theme-text-muted">
+        <div className={styles.emptyStateCard}>
+          <p className={styles.mutedBody}>
             No flashcards yet. Create a study guide and use &quot;Generate
             Flashcards&quot; to add some.
           </p>
@@ -109,44 +155,44 @@ export function FlashcardsContent() {
       )}
 
       {!loading && hasCards && view === "library" && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-theme-text-muted">{cards.length} card{cards.length !== 1 ? "s" : ""}</p>
+        <div className={styles.librarySection}>
+          <div className={styles.libraryToolbar}>
+            <p className={styles.cardCount}>{cards.length} card{cards.length !== 1 ? "s" : ""}</p>
             <button
               onClick={startReview}
-              className="glass rounded-xl px-5 py-2 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.02] transition-transform"
+              className={styles.startReviewButton}
             >
               Start Review
             </button>
           </div>
 
-          <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+          <div className={styles.cardList}>
             {cards.map((card) => (
-              <div key={card.id} className="glass-card rounded-xl p-4 space-y-2">
+              <div key={card.id} className={styles.cardRow}>
                 {editingId === card.id ? (
-                  <div className="space-y-2">
+                  <div className={styles.editForm}>
                     <input
                       value={editQuestion}
                       onChange={(e) => setEditQuestion(e.target.value)}
-                      className="w-full rounded-lg px-3 py-2 bg-theme-bg border border-theme-accent/20 text-theme-text text-sm focus:outline-none focus:border-theme-accent"
+                      className={styles.editInput}
                       placeholder="Question"
                     />
                     <input
                       value={editAnswer}
                       onChange={(e) => setEditAnswer(e.target.value)}
-                      className="w-full rounded-lg px-3 py-2 bg-theme-bg border border-theme-accent/20 text-theme-text text-sm focus:outline-none focus:border-theme-accent"
+                      className={styles.editInput}
                       placeholder="Answer"
                     />
-                    <div className="flex gap-2">
+                    <div className={styles.editActions}>
                       <button
                         onClick={() => saveEdit(card.id)}
-                        className="px-3 py-1 rounded-lg bg-theme-accent/10 text-theme-accent text-xs font-medium hover:bg-theme-accent/20 transition-colors"
+                        className={styles.saveButton}
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="px-3 py-1 rounded-lg text-theme-text-muted text-xs font-medium hover:bg-theme-accent/10 transition-colors"
+                        className={styles.cancelEditButton}
                       >
                         Cancel
                       </button>
@@ -154,18 +200,18 @@ export function FlashcardsContent() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm font-medium text-theme-text">{card.question}</p>
-                    <p className="text-sm text-theme-text-muted line-clamp-2">{card.answer}</p>
-                    <div className="flex gap-2 pt-1">
+                    <p className={styles.questionText}>{card.question}</p>
+                    <p className={styles.answerPreview}>{card.answer}</p>
+                    <div className={styles.cardActions}>
                       <button
                         onClick={() => startEdit(card)}
-                        className="px-3 py-1 rounded-lg text-xs font-medium text-theme-accent hover:bg-theme-accent/10 transition-colors"
+                        className={styles.editButton}
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => deleteCard(card.id)}
-                        className="px-3 py-1 rounded-lg text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors"
+                        className={styles.deleteButton}
                       >
                         Delete
                       </button>
@@ -179,42 +225,42 @@ export function FlashcardsContent() {
       )}
 
       {!loading && hasCards && view === "review" && (
-        <div className="space-y-4">
+        <div className={styles.librarySection}>
           <button
             onClick={() => setView("library")}
-            className="text-sm text-theme-accent hover:underline"
+            className={styles.backLink}
           >
             &larr; Back to Library
           </button>
 
           {current && (
-            <div className="glass-card rounded-2xl max-w-xl mx-auto p-6 space-y-4">
-              <p className="text-sm text-theme-text-muted">
+            <div className={styles.reviewCard}>
+              <p className={styles.reviewProgress}>
                 Card {index + 1} of {cards.length}
               </p>
-              <p className="font-serif text-xl text-theme-text">{current.question}</p>
+              <p className={styles.reviewQuestion}>{current.question}</p>
 
               {showAnswer ? (
                 <>
-                  <div className="border-t border-theme-accent/20 pt-4">
-                    <p className="text-base text-theme-text-muted">{current.answer}</p>
+                  <div className={styles.answerSection}>
+                    <p className={styles.answerText}>{current.answer}</p>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className={styles.ratingRow}>
                     <button
                       onClick={() => recordReview("again")}
-                      className="px-4 py-2 rounded-xl text-sm font-medium bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                      className={styles.againButton}
                     >
                       Again
                     </button>
                     <button
                       onClick={() => recordReview("good")}
-                      className="px-4 py-2 rounded-xl text-sm font-medium bg-theme-accent/10 text-theme-accent hover:bg-theme-accent/20 transition-colors"
+                      className={styles.goodButton}
                     >
                       Good
                     </button>
                     <button
                       onClick={() => recordReview("easy")}
-                      className="px-4 py-2 rounded-xl text-sm font-medium glass shadow-glass text-theme-text hover:scale-[1.02] transition-transform"
+                      className={styles.easyButton}
                     >
                       Easy
                     </button>
@@ -223,7 +269,7 @@ export function FlashcardsContent() {
               ) : (
                 <button
                   onClick={() => setShowAnswer(true)}
-                  className="glass rounded-xl px-6 py-2.5 shadow-glass text-base font-medium text-theme-text hover:scale-[1.02] transition-transform"
+                  className={styles.showAnswerButton}
                 >
                   Show Answer
                 </button>

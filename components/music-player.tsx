@@ -26,7 +26,36 @@ interface YTPlayer {
   destroy: () => void;
 }
 
-export function MusicPlayer() {
+const styles = {
+  videoLayer:
+    "fixed inset-0 overflow-hidden pointer-events-none transition-opacity duration-500",
+  videoLayerInner: "absolute inset-0",
+  ytPlayer: "h-full w-full",
+  darkOverlay:
+    "fixed inset-0 pointer-events-none transition-opacity duration-500",
+  controlsCard: "glass-card space-y-2 rounded-2xl p-3",
+  controlsRow: "flex items-center gap-3",
+  playButton:
+    "flex h-8 w-8 items-center justify-center rounded-full bg-theme-accent/20 transition-colors hover:bg-theme-accent/30",
+  iconPause: "h-3.5 w-3.5 text-theme-accent",
+  iconPlay: "ml-0.5 h-3.5 w-3.5 text-theme-accent",
+  trackBlock: "min-w-0 flex-1",
+  trackTitle: "truncate text-small font-medium text-theme-text",
+  trackStatus: "truncate text-caption text-theme-text-muted",
+  volumeRange: "h-1 w-16 accent-theme-accent",
+  customForm: "flex gap-1.5",
+  urlInput:
+    "flex-1 rounded-lg border border-theme-accent/20 bg-theme-bg px-2 py-1.5 text-small text-theme-text placeholder:text-theme-text-muted/50",
+  buttonReset:
+    "rounded-lg bg-theme-accent/10 px-3 py-1.5 text-caption text-theme-text-muted",
+  buttonSubmit: "rounded-lg bg-theme-accent px-3 py-1.5 text-caption text-white",
+};
+
+interface MusicPlayerProps {
+  shouldPlay?: boolean;
+}
+
+export function MusicPlayer({ shouldPlay }: MusicPlayerProps) {
   const { settings } = useTheme();
   const [apiReady, setApiReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -90,24 +119,36 @@ export function MusicPlayer() {
       events: {
         onReady: (event: { target: YTPlayer }) => {
           event.target.setVolume(volume);
-          event.target.playVideo();
-          setIsPlaying(true);
+          if (shouldPlay === undefined || shouldPlay) {
+            event.target.playVideo();
+          } else {
+            event.target.pauseVideo();
+          }
         },
         onStateChange: (event: { data: number }) => {
           setIsPlaying(event.data === 1);
         },
       },
     } as Record<string, unknown>);
-  }, [apiReady, settings.backgroundMusicEnabled, currentVideoId, volume]);
+  }, [apiReady, settings.backgroundMusicEnabled, currentVideoId, volume, shouldPlay]);
 
   useEffect(() => {
     playerRef.current?.setVolume(volume);
   }, [volume]);
 
+  useEffect(() => {
+    if (shouldPlay === undefined || !playerRef.current) return;
+    if (shouldPlay) {
+      playerRef.current.playVideo();
+    } else {
+      playerRef.current.pauseVideo();
+    }
+  }, [shouldPlay]);
+
   if (!settings.backgroundMusicEnabled) return null;
 
   const togglePlay = () => {
-    if (!playerRef.current) return;
+    if (!playerRef.current || shouldPlay !== undefined) return;
     if (isPlaying) {
       playerRef.current.pauseVideo();
     } else {
@@ -134,14 +175,14 @@ export function MusicPlayer() {
       {/* Fullscreen video background layer (only when custom URL is active) */}
       <div
         ref={containerRef}
-        className="fixed inset-0 pointer-events-none overflow-hidden transition-opacity duration-500"
+        className={styles.videoLayer}
         style={{
           zIndex: 0,
           opacity: showVideoBackground ? 0.2 : 0,
         }}
       >
         <div
-          className="absolute inset-0"
+          className={styles.videoLayerInner}
           style={{
             width: "110vw",
             height: "110vh",
@@ -149,14 +190,14 @@ export function MusicPlayer() {
             top: "-5vh",
           }}
         >
-          <div id="yt-player" className="w-full h-full" />
+          <div id="yt-player" className={styles.ytPlayer} />
         </div>
       </div>
 
       {/* Dark overlay to keep text readable when video is visible */}
       {showVideoBackground && (
         <div
-          className="fixed inset-0 pointer-events-none transition-opacity duration-500"
+          className={styles.darkOverlay}
           style={{
             zIndex: 1,
             backgroundColor: "var(--color-bg)",
@@ -166,29 +207,29 @@ export function MusicPlayer() {
       )}
 
       {/* Mini player controls */}
-      <div className="glass-card rounded-2xl p-3 space-y-2" style={{ position: "relative", zIndex: 10 }}>
-        <div className="flex items-center gap-3">
+      <div className={styles.controlsCard} style={{ position: "relative", zIndex: 10 }}>
+        <div className={styles.controlsRow}>
           <button
             onClick={togglePlay}
-            className="w-8 h-8 rounded-full bg-theme-accent/20 flex items-center justify-center hover:bg-theme-accent/30 transition-colors"
+            className={styles.playButton}
           >
             {isPlaying ? (
-              <svg className="w-3.5 h-3.5 text-theme-accent" viewBox="0 0 12 12" fill="currentColor">
+              <svg className={styles.iconPause} viewBox="0 0 12 12" fill="currentColor">
                 <rect x="1" y="1" width="3.5" height="10" rx="0.5" />
                 <rect x="7.5" y="1" width="3.5" height="10" rx="0.5" />
               </svg>
             ) : (
-              <svg className="w-3.5 h-3.5 text-theme-accent ml-0.5" viewBox="0 0 12 12" fill="currentColor">
+              <svg className={styles.iconPlay} viewBox="0 0 12 12" fill="currentColor">
                 <path d="M2 1.5l8.5 4.5L2 10.5z" />
               </svg>
             )}
           </button>
 
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-theme-text truncate font-medium">
+          <div className={styles.trackBlock}>
+            <p className={styles.trackTitle}>
               {usingCustom ? "Custom Track" : "Theme Music"}
             </p>
-            <p className="text-xs text-theme-text-muted truncate">
+            <p className={styles.trackStatus}>
               {isPlaying ? "Playing" : "Paused"}
               {usingCustom && isPlaying ? " (video bg)" : ""}
             </p>
@@ -200,29 +241,29 @@ export function MusicPlayer() {
             max="100"
             value={volume}
             onChange={(e) => setVolume(Number(e.target.value))}
-            className="w-16 h-1 accent-theme-accent"
+            className={styles.volumeRange}
           />
         </div>
 
-        <form onSubmit={handleCustomSubmit} className="flex gap-1.5">
+        <form onSubmit={handleCustomSubmit} className={styles.customForm}>
           <input
             value={customUrl}
             onChange={(e) => setCustomUrl(e.target.value)}
             placeholder="Paste YouTube URL..."
-            className="flex-1 rounded-lg px-2 py-1.5 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50"
+            className={styles.urlInput}
           />
           {usingCustom ? (
             <button
               type="button"
               onClick={clearCustom}
-              className="text-xs px-3 py-1.5 rounded-lg bg-theme-accent/10 text-theme-text-muted"
+              className={styles.buttonReset}
             >
               Reset
             </button>
           ) : (
             <button
               type="submit"
-              className="text-xs px-3 py-1.5 rounded-lg bg-theme-accent text-white"
+              className={styles.buttonSubmit}
             >
               Play
             </button>

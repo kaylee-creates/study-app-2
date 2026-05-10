@@ -66,9 +66,16 @@ export interface PomodoroSettings {
 export interface ScrapbookItem {
   id: string;
   pageId: string;
-  type: "image" | "widget";
+  type: "image" | "widget" | "stroke" | "text" | "shape";
   imageUrl?: string;
   imageName?: string;
+  textContent?: string;
+  color?: string;
+  fillColor?: string;
+  strokeWidth?: number;
+  fontSize?: number;
+  shapeKind?: "rectangle" | "ellipse" | "line" | "arrow";
+  points?: { x: number; y: number }[];
   x: number;
   y: number;
   width: number;
@@ -79,7 +86,26 @@ export interface ScrapbookItem {
   createdAt: string;
 }
 
-export type StudyGuideFormat = "tree" | "cornell" | "mapping";
+export type StudyGuideFormat = "tree" | "cornell" | "questions";
+
+export interface StudyGuideAnnotation {
+  id: string;
+  term: string;
+  note: string;
+  createdAt: string;
+}
+
+export type HighlightColor = "pink" | "orange" | "yellow" | "green" | "blue" | "purple";
+
+export interface NotepadEntry {
+  id: string;
+  guideId: string;
+  guideTitle: string;
+  text: string;
+  color: HighlightColor;
+  note: string;
+  createdAt: string;
+}
 
 export interface StudyGuide {
   id: string;
@@ -88,6 +114,7 @@ export interface StudyGuide {
   content: string;
   rawSource: string;
   createdAt: string;
+  annotations?: StudyGuideAnnotation[];
 }
 
 export interface UserSettings {
@@ -108,6 +135,7 @@ export interface StudyState {
   scrapbookItems: ScrapbookItem[];
   pomodoroSettings: PomodoroSettings;
   studyGuides: StudyGuide[];
+  notepadEntries: NotepadEntry[];
   userSettings: UserSettings;
 }
 

@@ -48,6 +48,7 @@ function getDefaultState(): StudyState {
     scrapbookItems: [],
     pomodoroSettings: defaultSettings,
     studyGuides: [],
+    notepadEntries: [],
     userSettings: defaultUserSettings,
   };
 }
@@ -62,6 +63,7 @@ function mergeWithDefaults(partial: Partial<StudyState>): StudyState {
     scrapbookItems: partial.scrapbookItems ?? [],
     pomodoroSettings: partial.pomodoroSettings ?? defaultSettings,
     studyGuides: partial.studyGuides ?? [],
+    notepadEntries: partial.notepadEntries ?? [],
     userSettings: {
       ...defaultUserSettings,
       ...(partial.userSettings ?? {}),
@@ -98,6 +100,7 @@ export const localStudyRepository: StudyRepository = {
       scrapbookItems: partial.scrapbookItems ?? current.scrapbookItems,
       pomodoroSettings: partial.pomodoroSettings ?? current.pomodoroSettings,
       studyGuides: partial.studyGuides ?? current.studyGuides,
+      notepadEntries: partial.notepadEntries ?? current.notepadEntries,
       userSettings: partial.userSettings
         ? { ...current.userSettings, ...partial.userSettings }
         : current.userSettings,

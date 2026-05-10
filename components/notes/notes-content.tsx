@@ -8,6 +8,33 @@ import type { AiFlashcardSuggestion } from "@/lib/domain";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+const styles = {
+  root: "space-y-6",
+  pageTitle: "font-serif text-page-title text-theme-text",
+  layout: "grid gap-4 md:grid-cols-[220px_1fr]",
+  cardHeaderTight: "pb-2",
+  cardTitleSm: "text-small",
+  listContent: "space-y-2",
+  noteListItem:
+    "block w-full rounded-lg px-3 py-2 text-left text-small",
+  noteListItemSelected: "bg-theme-accent/10",
+  noteListItemIdle: "hover:bg-theme-accent/5",
+  editorContent: "space-y-4",
+  titleInput:
+    "w-full rounded border border-theme-accent/20 bg-theme-bg px-3 py-2 text-theme-text",
+  bodyTextarea:
+    "min-h-[200px] w-full rounded border border-theme-accent/20 bg-theme-bg px-3 py-2 text-theme-text",
+  actionRow: "flex flex-wrap gap-2",
+  summaryBox: "rounded-lg border border-theme-accent/20 bg-theme-surface/80 p-4",
+  summaryLabel: "mb-2 text-small font-medium text-theme-text-muted",
+  summaryBody: "whitespace-pre-wrap text-small text-theme-text",
+  flashcardBox: "space-y-2 rounded-lg border border-theme-accent/20 bg-theme-surface/80 p-4",
+  flashcardHeading: "text-small font-medium text-theme-text-muted",
+  flashcardList: "space-y-2",
+  flashcardRow: "flex items-center justify-between gap-2 text-small",
+  flashcardQuestion: "text-theme-text",
+};
+
 export function NotesContent() {
   const [noteId, setNoteId] = useQueryState("noteId", parseAsString.withDefault(""));
   const selectedId = noteId || null;
@@ -122,14 +149,14 @@ export function NotesContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-handwritten text-3xl text-cozy-ink">Notes & AI</h1>
-      <div className="grid gap-4 md:grid-cols-[220px_1fr]">
+    <div className={styles.root}>
+      <h1 className={styles.pageTitle}>Notes & AI</h1>
+      <div className={styles.layout}>
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Notes</CardTitle>
+          <CardHeader className={styles.cardHeaderTight}>
+            <CardTitle className={styles.cardTitleSm}>Notes</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className={styles.listContent}>
             <Button variant="secondary" size="sm" onClick={createNew}>
               New note
             </Button>
@@ -138,8 +165,8 @@ export function NotesContent() {
                 key={n.id}
                 type="button"
                 onClick={() => setNoteId(n.id)}
-                className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-                  selectedId === n.id ? "bg-cozy-grid" : "hover:bg-cozy-grid/60"
+                className={`${styles.noteListItem} ${
+                  selectedId === n.id ? styles.noteListItemSelected : styles.noteListItemIdle
                 }`}
               >
                 {n.title || "Untitled"}
@@ -148,27 +175,27 @@ export function NotesContent() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">
+          <CardHeader className={styles.cardHeaderTight}>
+            <CardTitle className={styles.cardTitleSm}>
               {selected ? "Edit" : "Select or create a note"}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={styles.editorContent}>
             {selected && (
               <>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded border border-cozy-grid bg-cozy-paper px-3 py-2 text-cozy-ink"
+                  className={styles.titleInput}
                   placeholder="Title"
                 />
                 <textarea
                   value={rawContent}
                   onChange={(e) => setRawContent(e.target.value)}
-                  className="min-h-[200px] w-full rounded border border-cozy-grid bg-cozy-paper px-3 py-2 text-cozy-ink"
+                  className={styles.bodyTextarea}
                   placeholder="Write your note..."
                 />
-                <div className="flex flex-wrap gap-2">
+                <div className={styles.actionRow}>
                   <Button onClick={save}>Save</Button>
                   <Button
                     variant="secondary"
@@ -186,23 +213,23 @@ export function NotesContent() {
                   </Button>
                 </div>
                 {summary !== null && (
-                  <div className="rounded-lg border border-cozy-grid bg-cozy-paper/80 p-4">
-                    <p className="text-sm font-medium text-cozy-muted mb-2">Summary</p>
-                    <p className="text-cozy-ink whitespace-pre-wrap text-sm">{summary}</p>
+                  <div className={styles.summaryBox}>
+                    <p className={styles.summaryLabel}>Summary</p>
+                    <p className={styles.summaryBody}>{summary}</p>
                   </div>
                 )}
                 {suggestedCards.length > 0 && (
-                  <div className="rounded-lg border border-cozy-grid bg-cozy-paper/80 p-4 space-y-2">
-                    <p className="text-sm font-medium text-cozy-muted">
+                  <div className={styles.flashcardBox}>
+                    <p className={styles.flashcardHeading}>
                       Add to deck
                     </p>
-                    <ul className="space-y-2">
+                    <ul className={styles.flashcardList}>
                       {suggestedCards.map((c, i) => (
                         <li
                           key={i}
-                          className="flex items-center justify-between gap-2 text-sm"
+                          className={styles.flashcardRow}
                         >
-                          <span className="text-cozy-ink">
+                          <span className={styles.flashcardQuestion}>
                             Q: {c.question}
                           </span>
                           <Button

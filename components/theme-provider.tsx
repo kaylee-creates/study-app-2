@@ -138,6 +138,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [settings, persistSettings]
   );
 
+  const handleToastDone = useCallback(() => {
+    setToastAmount(null);
+  }, []);
+
   return (
     <ThemeContext.Provider
       value={{
@@ -153,7 +157,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     >
       {children}
       {toastAmount !== null && (
-        <PointsToast amount={toastAmount} onDone={() => setToastAmount(null)} />
+        <PointsToast amount={toastAmount} onDone={handleToastDone} />
       )}
     </ThemeContext.Provider>
   );

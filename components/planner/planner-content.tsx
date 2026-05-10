@@ -41,6 +41,71 @@ const emptyForm = (date?: string): EventFormData => ({
   isAllDay: false,
 });
 
+const styles = {
+  root: "space-y-4",
+  header: "flex items-center justify-between",
+  titleWrap: "inline-block",
+  pageTitle: "font-serif text-page-title text-theme-text",
+  titleUnderline: "mt-0.5",
+  addEventHeaderButton:
+    "glass rounded-xl px-4 py-2 shadow-glass text-small font-medium text-theme-text hover:scale-[1.02] transition-transform",
+  monthNav: "flex items-center justify-between glass-card rounded-2xl p-3",
+  monthNavArrow: "px-3 py-1 rounded-lg hover:bg-theme-accent/10 text-theme-text text-small",
+  monthNavCenter: "flex items-center gap-3",
+  monthLabel: "font-serif text-section-title text-theme-text",
+  todayButton: "text-caption px-2 py-0.5 rounded bg-theme-accent/10 text-theme-accent font-medium",
+  calendarShell: "glass-card rounded-2xl p-3 overflow-hidden",
+  weekdayRow: "grid grid-cols-7 mb-1",
+  weekdayCell: "text-center text-caption font-medium text-theme-text-muted py-1",
+  dayGrid: "grid grid-cols-7 gap-px",
+  emptyCell: "min-h-[4.5rem] bg-theme-bg/30 rounded-lg",
+  dayCell:
+    "min-h-[4.5rem] p-1 rounded-lg text-left transition-colors",
+  dayCellSelected: "bg-theme-accent/15 ring-1 ring-theme-accent/30",
+  dayCellIdle: "hover:bg-theme-accent/5",
+  dayNumber: "inline-flex items-center justify-center w-6 h-6 text-caption rounded-full",
+  dayNumberToday: "bg-theme-accent text-white font-bold",
+  dayNumberDefault: "text-theme-text",
+  eventChip:
+    "text-[10px] leading-tight text-theme-accent truncate px-1 py-0.5 rounded bg-theme-accent/10",
+  eventOverflow: "text-[10px] text-theme-text-muted px-1",
+  eventListStack: "mt-0.5 space-y-0.5",
+  selectedDayPanel: "glass-card rounded-2xl p-4 space-y-3",
+  selectedDayHeader: "flex items-center justify-between",
+  selectedDayTitle: "font-serif text-card-title text-theme-text",
+  addOnDayLink: "text-small text-theme-accent hover:underline",
+  noEvents: "text-small text-theme-text-muted",
+  eventList: "space-y-2",
+  eventListItemButton:
+    "w-full text-left rounded-xl bg-theme-bg p-3 hover:bg-theme-accent/5 transition-colors",
+  eventTitle: "block text-small font-medium text-theme-text",
+  eventTime: "text-caption text-theme-text-muted",
+  eventDescription: "block text-caption text-theme-text-muted mt-1 truncate",
+  modalBackdrop:
+    "fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm",
+  modalCard: "glass-card rounded-3xl p-6 max-w-sm w-full mx-4 space-y-4",
+  modalTitle: "font-serif text-section-title text-theme-text",
+  modalInput:
+    "w-full rounded-xl px-4 py-2.5 text-small bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50",
+  modalInputNoPlaceholder:
+    "w-full rounded-xl px-4 py-2.5 text-small bg-theme-bg border border-theme-accent/20 text-theme-text",
+  modalLabel: "flex items-center gap-2 text-small text-theme-text",
+  modalCheckbox: "accent-theme-accent",
+  timeRow: "flex gap-2",
+  timeInput:
+    "flex-1 rounded-xl px-3 py-2 text-small bg-theme-bg border border-theme-accent/20 text-theme-text",
+  timeRowLabel: "self-center text-theme-text-muted text-small",
+  modalTextarea:
+    "w-full rounded-xl px-4 py-2.5 text-small bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50 resize-none",
+  modalActions: "flex gap-2",
+  modalPrimaryButton:
+    "flex-1 glass rounded-xl px-4 py-2.5 shadow-glass text-small font-medium text-theme-text hover:scale-[1.01] transition-transform disabled:opacity-50",
+  modalDeleteButton:
+    "px-4 py-2.5 rounded-xl text-small text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-colors",
+  modalCancelButton:
+    "px-4 py-2.5 rounded-xl text-small text-theme-text-muted hover:bg-theme-accent/5 transition-colors",
+};
+
 export function PlannerContent() {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
@@ -155,54 +220,54 @@ export function PlannerContent() {
     : [];
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="inline-block">
-          <h1 className="font-serif text-3xl text-theme-text">Calendar</h1>
-          <svg className="mt-0.5" width="100" height="8" viewBox="0 0 100 8" fill="none">
+    <div className={styles.root}>
+      <div className={styles.header}>
+        <div className={styles.titleWrap}>
+          <h1 className={styles.pageTitle}>Calendar</h1>
+          <svg className={styles.titleUnderline} width="100" height="8" viewBox="0 0 100 8" fill="none">
             <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 98,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
           </svg>
         </div>
         <button
           onClick={() => openAddEvent()}
-          className="glass rounded-xl px-4 py-2 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.02] transition-transform"
+          className={styles.addEventHeaderButton}
         >
           + Add Event
         </button>
       </div>
 
       {/* Month navigation */}
-      <div className="flex items-center justify-between glass-card rounded-2xl p-3">
-        <button onClick={prevMonth} className="px-3 py-1 rounded-lg hover:bg-theme-accent/10 text-theme-text text-sm">&larr;</button>
-        <div className="flex items-center gap-3">
-          <span className="font-serif text-xl text-theme-text">
+      <div className={styles.monthNav}>
+        <button onClick={prevMonth} className={styles.monthNavArrow}>&larr;</button>
+        <div className={styles.monthNavCenter}>
+          <span className={styles.monthLabel}>
             {MONTH_NAMES[month]} {year}
           </span>
           <button
             onClick={goToday}
-            className="text-xs px-2 py-0.5 rounded bg-theme-accent/10 text-theme-accent font-medium"
+            className={styles.todayButton}
           >
             Today
           </button>
         </div>
-        <button onClick={nextMonth} className="px-3 py-1 rounded-lg hover:bg-theme-accent/10 text-theme-text text-sm">&rarr;</button>
+        <button onClick={nextMonth} className={styles.monthNavArrow}>&rarr;</button>
       </div>
 
       {/* Calendar grid */}
-      <div className="glass-card rounded-2xl p-3 overflow-hidden">
+      <div className={styles.calendarShell}>
         {/* Day headers */}
-        <div className="grid grid-cols-7 mb-1">
+        <div className={styles.weekdayRow}>
           {DAYS.map((d) => (
-            <div key={d} className="text-center text-xs font-medium text-theme-text-muted py-1">
+            <div key={d} className={styles.weekdayCell}>
               {d}
             </div>
           ))}
         </div>
         {/* Day cells */}
-        <div className="grid grid-cols-7 gap-px">
+        <div className={styles.dayGrid}>
           {cells.map((day, i) => {
             if (day === null) {
-              return <div key={i} className="min-h-[4.5rem] bg-theme-bg/30 rounded-lg" />;
+              return <div key={i} className={styles.emptyCell} />;
             }
             const dateStr = formatDate(year, month, day);
             const isToday = dateStr === today;
@@ -213,32 +278,24 @@ export function PlannerContent() {
               <button
                 key={i}
                 onClick={() => setSelectedDay(isSelected ? null : dateStr)}
-                className={`min-h-[4.5rem] p-1 rounded-lg text-left transition-colors ${
-                  isSelected
-                    ? "bg-theme-accent/15 ring-1 ring-theme-accent/30"
-                    : "hover:bg-theme-accent/5"
-                }`}
+                className={`${styles.dayCell} ${isSelected ? styles.dayCellSelected : styles.dayCellIdle}`}
               >
                 <span
-                  className={`inline-flex items-center justify-center w-6 h-6 text-xs rounded-full ${
-                    isToday
-                      ? "bg-theme-accent text-white font-bold"
-                      : "text-theme-text"
-                  }`}
+                  className={`${styles.dayNumber} ${isToday ? styles.dayNumberToday : styles.dayNumberDefault}`}
                 >
                   {day}
                 </span>
-                <div className="mt-0.5 space-y-0.5">
+                <div className={styles.eventListStack}>
                   {dayEvts.slice(0, 2).map((evt) => (
                     <div
                       key={evt.id}
-                      className="text-[10px] leading-tight text-theme-accent truncate px-1 py-0.5 rounded bg-theme-accent/10"
+                      className={styles.eventChip}
                     >
                       {evt.title}
                     </div>
                   ))}
                   {dayEvts.length > 2 && (
-                    <div className="text-[10px] text-theme-text-muted px-1">
+                    <div className={styles.eventOverflow}>
                       +{dayEvts.length - 2} more
                     </div>
                   )}
@@ -251,41 +308,41 @@ export function PlannerContent() {
 
       {/* Selected day events */}
       {selectedDay && (
-        <div className="glass-card rounded-2xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-serif text-lg text-theme-text">
+        <div className={styles.selectedDayPanel}>
+          <div className={styles.selectedDayHeader}>
+            <h3 className={styles.selectedDayTitle}>
               Events for {selectedDay}
             </h3>
             <button
               onClick={() => openAddEvent(selectedDay)}
-              className="text-sm text-theme-accent hover:underline"
+              className={styles.addOnDayLink}
             >
               + Add
             </button>
           </div>
           {dayEvents.length === 0 ? (
-            <p className="text-sm text-theme-text-muted">No events</p>
+            <p className={styles.noEvents}>No events</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className={styles.eventList}>
               {dayEvents.map((evt) => (
                 <li key={evt.id}>
                   <button
                     onClick={() => openEditEvent(evt)}
-                    className="w-full text-left rounded-xl bg-theme-bg p-3 hover:bg-theme-accent/5 transition-colors"
+                    className={styles.eventListItemButton}
                   >
-                    <span className="block text-sm font-medium text-theme-text">
+                    <span className={styles.eventTitle}>
                       {evt.title}
                     </span>
                     {!evt.isAllDay && evt.startTime && (
-                      <span className="text-xs text-theme-text-muted">
+                      <span className={styles.eventTime}>
                         {evt.startTime} - {evt.endTime}
                       </span>
                     )}
                     {evt.isAllDay && (
-                      <span className="text-xs text-theme-text-muted">All day</span>
+                      <span className={styles.eventTime}>All day</span>
                     )}
                     {evt.description && (
-                      <span className="block text-xs text-theme-text-muted mt-1 truncate">
+                      <span className={styles.eventDescription}>
                         {evt.description}
                       </span>
                     )}
@@ -299,15 +356,15 @@ export function PlannerContent() {
 
       {/* Event modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="glass-card rounded-3xl p-6 max-w-sm w-full mx-4 space-y-4">
-            <h3 className="font-serif text-xl text-theme-text">
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modalCard}>
+            <h3 className={styles.modalTitle}>
               {editingId ? "Edit Event" : "New Event"}
             </h3>
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full rounded-xl px-4 py-2.5 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50"
+              className={styles.modalInput}
               placeholder="Event title"
               autoFocus
             />
@@ -315,33 +372,33 @@ export function PlannerContent() {
               type="date"
               value={form.date}
               onChange={(e) => setForm({ ...form, date: e.target.value })}
-              className="w-full rounded-xl px-4 py-2.5 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text"
+              className={styles.modalInputNoPlaceholder}
             />
 
-            <label className="flex items-center gap-2 text-sm text-theme-text">
+            <label className={styles.modalLabel}>
               <input
                 type="checkbox"
                 checked={form.isAllDay}
                 onChange={(e) => setForm({ ...form, isAllDay: e.target.checked })}
-                className="accent-theme-accent"
+                className={styles.modalCheckbox}
               />
               All day
             </label>
 
             {!form.isAllDay && (
-              <div className="flex gap-2">
+              <div className={styles.timeRow}>
                 <input
                   type="time"
                   value={form.startTime}
                   onChange={(e) => setForm({ ...form, startTime: e.target.value })}
-                  className="flex-1 rounded-xl px-3 py-2 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text"
+                  className={styles.timeInput}
                 />
-                <span className="self-center text-theme-text-muted text-sm">to</span>
+                <span className={styles.timeRowLabel}>to</span>
                 <input
                   type="time"
                   value={form.endTime}
                   onChange={(e) => setForm({ ...form, endTime: e.target.value })}
-                  className="flex-1 rounded-xl px-3 py-2 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text"
+                  className={styles.timeInput}
                 />
               </div>
             )}
@@ -349,30 +406,30 @@ export function PlannerContent() {
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full rounded-xl px-4 py-2.5 text-sm bg-theme-bg border border-theme-accent/20 text-theme-text placeholder:text-theme-text-muted/50 resize-none"
+              className={styles.modalTextarea}
               placeholder="Description (optional)"
               rows={2}
             />
 
-            <div className="flex gap-2">
+            <div className={styles.modalActions}>
               <button
                 onClick={saveEvent}
                 disabled={!form.title.trim()}
-                className="flex-1 glass rounded-xl px-4 py-2.5 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.01] transition-transform disabled:opacity-50"
+                className={styles.modalPrimaryButton}
               >
                 {editingId ? "Update" : "Create"}
               </button>
               {editingId && (
                 <button
                   onClick={deleteEvent}
-                  className="px-4 py-2.5 rounded-xl text-sm text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-colors"
+                  className={styles.modalDeleteButton}
                 >
                   Delete
                 </button>
               )}
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl text-sm text-theme-text-muted hover:bg-theme-accent/5 transition-colors"
+                className={styles.modalCancelButton}
               >
                 Cancel
               </button>

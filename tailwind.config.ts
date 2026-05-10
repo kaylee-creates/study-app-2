@@ -27,6 +27,14 @@ const config: Config = {
         serif: ["var(--font-serif)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
+      fontSize: {
+        "page-title": "var(--fs-page-title)",
+        "section-title": "var(--fs-section-title)",
+        "card-title": "var(--fs-card-title)",
+        body: "var(--fs-body)",
+        small: "var(--fs-small)",
+        caption: "var(--fs-caption)",
+      },
       boxShadow: {
         glass:
           "0 2px 8px var(--color-shadow), 0 4px 16px var(--color-shadow-light), 0 8px 32px var(--color-shadow-lighter)",

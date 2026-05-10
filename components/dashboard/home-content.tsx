@@ -19,6 +19,26 @@ const buttons = [
   { href: "/study-guide", label: "note maker", top: "78%", left: "50%", rotate: 0, delay: 1000 },
 ];
 
+const styles = {
+  root: "relative min-h-[calc(100vh-6rem)] overflow-hidden",
+  bgImage: "absolute inset-0 w-full h-full object-cover pointer-events-none",
+  centeredWrapper: "absolute inset-0 z-10 flex items-center justify-center",
+  innerWrapper: "relative",
+  contentBackdrop:
+    "pointer-events-none absolute -inset-3 z-0 rounded-[2.25rem] border shadow-glass",
+  welcomeArea:
+    "absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none",
+  welcomeHeading: "relative z-10 mb-1 text-center leading-none",
+  welcomeCursive: "font-cursive text-page-title sm:text-4xl text-theme-text",
+  welcomeName: "font-serif text-6xl sm:text-7xl md:text-8xl text-theme-name",
+  tagline: "relative z-10 mt-3 font-serif text-section-title text-theme-accent-yellow",
+  navButton:
+    "absolute z-20 block text-center font-cursive text-section-title sm:text-2xl hover:scale-105 pointer-events-auto",
+  navButtonLabel: "text-theme-text-muted",
+  pointsRow: "absolute bottom-6 right-6 z-10 flex items-center gap-2",
+  pointsText: "font-serif text-card-title text-theme-accent-yellow",
+};
+
 export function HomeContent() {
   const { settings } = useTheme();
   const name = settings.displayName || "Student";
@@ -43,12 +63,12 @@ export function HomeContent() {
   });
 
   return (
-    <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden">
+    <div className={styles.root}>
       {/* Theme background image */}
       <img
         src={bgImage}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        className={styles.bgImage}
         style={{
           opacity: mounted ? (isDark ? 0.9 : 1) : 0,
           transition: "opacity 1000ms ease-out",
@@ -56,26 +76,44 @@ export function HomeContent() {
       />
 
       {/* Centered wrapper: holds text + buttons so buttons orbit the text */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
-        <div className="relative" style={{ width: "clamp(340px, 80vw, 720px)", height: "clamp(400px, 65vh, 600px)" }}>
+      <div className={styles.centeredWrapper}>
+        <div className={styles.innerWrapper} style={{ width: "clamp(340px, 80vw, 720px)", height: "clamp(400px, 65vh, 600px)" }}>
+          <div
+            className={styles.contentBackdrop}
+            style={
+              isDark
+                ? {
+                    background: "color-mix(in srgb, var(--color-bg) 72%, transparent)",
+                    borderColor: "color-mix(in srgb, var(--color-accent) 30%, transparent)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                  }
+                : {
+                    background: "#ffffff",
+                    borderColor: "rgba(0, 0, 0, 0.08)",
+                    backdropFilter: "blur(6px)",
+                    WebkitBackdropFilter: "blur(6px)",
+                  }
+            }
+          />
           {/* Welcome text -- dead center of wrapper */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <h1 className="leading-none mb-1 text-center" style={enter(300)}>
+          <div className={styles.welcomeArea}>
+            <h1 className={styles.welcomeHeading} style={enter(300)}>
               <span
-                className="font-cursive text-3xl sm:text-4xl text-theme-text"
+                className={styles.welcomeCursive}
                 style={{ textShadow: darkGlow }}
               >
                 welcome,
               </span>{" "}
               <span
-                className="font-serif text-6xl sm:text-7xl md:text-8xl text-theme-name"
+                className={styles.welcomeName}
                 style={{ textShadow: darkGlow }}
               >
                 {name}
               </span>
             </h1>
             <p
-              className="font-serif text-xl mt-3 text-theme-accent-yellow"
+              className={styles.tagline}
               style={{ ...enter(500), textShadow: darkGlow }}
             >
               what would you like to start with today?
@@ -87,7 +125,7 @@ export function HomeContent() {
             <Link
               key={b.href}
               href={b.href}
-              className="absolute z-20 block text-center font-cursive text-xl sm:text-2xl hover:scale-105 pointer-events-auto"
+              className={styles.navButton}
               style={{
                 top: b.top,
                 left: b.left,
@@ -109,7 +147,7 @@ export function HomeContent() {
                 justifyContent: "center",
               }}
             >
-              <span className="text-theme-text-muted" style={{ textShadow: darkGlow }}>{b.label}</span>
+              <span className={styles.navButtonLabel} style={{ textShadow: darkGlow }}>{b.label}</span>
             </Link>
           ))}
         </div>
@@ -117,11 +155,11 @@ export function HomeContent() {
 
       {/* Points display (bottom-right) */}
       <div
-        className="absolute bottom-6 right-6 z-10 flex items-center gap-2"
+        className={styles.pointsRow}
         style={enter(1200)}
       >
         <span
-          className="font-serif text-lg text-theme-accent-yellow"
+          className={styles.pointsText}
           style={{ textShadow: darkGlow }}
         >
           your points today {settings.totalPoints}

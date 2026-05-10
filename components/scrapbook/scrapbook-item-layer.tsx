@@ -17,6 +17,32 @@ interface ScrapbookItemLayerProps {
   onRotate: (id: string, rotation: number) => void;
 }
 
+const styles = {
+  wrapper: "group absolute cursor-grab active:cursor-grabbing",
+  imageFrame:
+    "absolute overflow-hidden rounded-lg border-2 border-theme-accent/20 bg-theme-surface shadow-md transition",
+  imageFrameDragging: "ring-2 ring-theme-accent ring-offset-2",
+  image: "pointer-events-none h-full w-full select-none object-cover",
+  toolbar:
+    "absolute flex gap-1 opacity-0 transition-opacity group-hover:opacity-100",
+  toolbarButtonForward:
+    "h-7 w-7 text-theme-text-muted hover:text-theme-text",
+  toolbarButtonRemove:
+    "h-7 w-7 text-theme-text-muted hover:text-theme-accent",
+  toolbarGlyph: "text-xs",
+  rotateHandleWrap:
+    "absolute opacity-0 transition-opacity group-hover:opacity-100",
+  rotateHandleColumn: "flex flex-col items-center",
+  rotateKnob:
+    "h-5 w-5 cursor-grab rounded-full border-2 border-theme-accent bg-white transition-colors hover:bg-theme-accent/20",
+  rotateStem: "h-3 w-px bg-theme-accent/50",
+  resizeHandleWrap:
+    "absolute h-5 w-5 cursor-se-resize opacity-0 transition-opacity group-hover:opacity-100",
+  resizeHandleWrapSw:
+    "absolute h-5 w-5 cursor-sw-resize opacity-0 transition-opacity group-hover:opacity-100",
+  resizeHandleFace: "h-full w-full rounded-sm border-2 border-theme-accent bg-white",
+};
+
 export function ScrapbookItemLayer({
   item,
   onMove,
@@ -143,7 +169,7 @@ export function ScrapbookItemLayer({
   return (
     <div
       ref={wrapperRef}
-      className="absolute cursor-grab active:cursor-grabbing group"
+      className={styles.wrapper}
       style={{
         left: item.x - 12,
         top: item.y - 44,
@@ -159,8 +185,8 @@ export function ScrapbookItemLayer({
     >
       <div
         className={cn(
-          "absolute rounded-lg overflow-hidden border-2 border-theme-accent/20 bg-theme-surface shadow-md transition",
-          mode === "drag" && "ring-2 ring-theme-accent ring-offset-2"
+          styles.imageFrame,
+          mode === "drag" && styles.imageFrameDragging
         )}
         style={{
           left: 12,
@@ -172,74 +198,74 @@ export function ScrapbookItemLayer({
         <img
           src={item.imageUrl}
           alt={item.imageName ?? "Scrapbook image"}
-          className="w-full h-full object-cover pointer-events-none select-none"
+          className={styles.image}
           draggable={false}
         />
       </div>
 
       {/* Top toolbar: bring forward / remove */}
-      <div className="absolute flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ top: 8, right: 12 }}>
+      <div className={styles.toolbar} style={{ top: 8, right: 12 }}>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-theme-text-muted hover:text-theme-text"
+          className={styles.toolbarButtonForward}
           onClick={(e) => { e.stopPropagation(); onBringForward(item.id); }}
           title="Bring forward"
         >
-          <span className="text-xs">&#8593;</span>
+          <span className={styles.toolbarGlyph}>&#8593;</span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-theme-text-muted hover:text-theme-accent"
+          className={styles.toolbarButtonRemove}
           onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
           title="Remove"
         >
-          <span className="text-xs">&times;</span>
+          <span className={styles.toolbarGlyph}>&times;</span>
         </Button>
       </div>
 
       {/* Rotation handle -- circle above center, connected by a thin line */}
       <div
         data-handle="rotate"
-        className="absolute opacity-0 group-hover:opacity-100 transition-opacity"
+        className={styles.rotateHandleWrap}
         style={{ left: "50%", top: "2px", transform: "translateX(-50%)" }}
       >
-        <div className="flex flex-col items-center">
+        <div className={styles.rotateHandleColumn}>
           <div
-            className="w-5 h-5 rounded-full border-2 border-theme-accent bg-white cursor-grab hover:bg-theme-accent/20 transition-colors"
+            className={styles.rotateKnob}
             onPointerDown={handleRotateDown}
             onPointerMove={handleRotateMove}
             onPointerUp={handleRotateUp}
           />
-          <div className="w-px h-3 bg-theme-accent/50" />
+          <div className={styles.rotateStem} />
         </div>
       </div>
 
       {/* Resize handle -- bottom-right corner */}
       <div
         data-handle="resize"
-        className="absolute w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity cursor-se-resize"
+        className={styles.resizeHandleWrap}
         style={{ bottom: 0, right: 4 }}
         onPointerDown={handleResizeDown}
         onPointerMove={handleResizeMove}
         onPointerUp={handleResizeUp}
       >
-        <div className="w-full h-full rounded-sm border-2 border-theme-accent bg-white" />
+        <div className={styles.resizeHandleFace} />
       </div>
 
       {/* Resize handle -- bottom-left corner */}
       <div
         data-handle="resize"
-        className="absolute w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity cursor-sw-resize"
+        className={styles.resizeHandleWrapSw}
         style={{ bottom: 0, left: 4 }}
         onPointerDown={handleResizeDown}
         onPointerMove={handleResizeMove}
         onPointerUp={handleResizeUp}
       >
-        <div className="w-full h-full rounded-sm border-2 border-theme-accent bg-white" />
+        <div className={styles.resizeHandleFace} />
       </div>
     </div>
   );

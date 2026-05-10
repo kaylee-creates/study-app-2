@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { localStudyRepository, generateId } from "@/lib/storage-local";
 import { useTheme } from "@/components/theme-provider";
 
-type Phase = "focus" | "shortBreak" | "longBreak";
+export type PomodoroPhase = "focus" | "shortBreak" | "longBreak";
+
+interface PomodoroTimerCardProps {
+  onStateChange?: (state: { isRunning: boolean; phase: PomodoroPhase }) => void;
+}
 
 const PRESETS = {
   focus: [15, 25, 45],
@@ -12,7 +16,7 @@ const PRESETS = {
   longBreak: [15, 20],
 };
 
-const PHASE_LABELS: Record<Phase, string> = {
+const PHASE_LABELS: Record<PomodoroPhase, string> = {
   focus: "Focus",
   shortBreak: "Short Break",
   longBreak: "Long Break",
@@ -24,12 +28,39 @@ function formatSeconds(sec: number): string {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
-export function PomodoroTimerCard() {
+const styles = {
+  root: "flex flex-col items-center gap-8 pt-8",
+  phaseBadge: "glass rounded-full px-6 py-2 shadow-glass",
+  phaseTitle: "font-serif text-card-title font-medium text-theme-text",
+  phaseSession: "ml-2 text-small text-theme-text-muted",
+  timerWrap: "relative flex items-center justify-center",
+  ringSvg: "h-64 w-64 -rotate-90 sm:h-80 sm:w-80",
+  ringProgress: "transition-all duration-1000 ease-linear",
+  timeDisplay:
+    "absolute font-sans text-6xl font-light tabular-nums tracking-tight text-theme-text sm:text-7xl",
+  controlsRow: "flex gap-3",
+  primaryButton:
+    "glass rounded-2xl px-8 py-3 font-serif text-card-title font-medium text-theme-text shadow-glass transition-transform hover:scale-[1.03]",
+  resetButton:
+    "glass rounded-2xl px-6 py-3 font-serif text-card-title text-theme-text-muted shadow-glass transition-transform hover:scale-[1.03]",
+  coinHint: "flex items-center gap-2 text-theme-text-muted",
+  coinIcon: "h-4 w-4 shrink-0",
+  coinText: "text-small",
+  presetsCard: "glass-card w-full max-w-sm space-y-3 rounded-2xl p-4",
+  presetRow: "flex items-center justify-between",
+  presetLabel: "text-small text-theme-text-muted",
+  presetButtons: "flex gap-1.5",
+  presetButtonBase: "rounded-lg px-3 py-1.5 text-small font-medium transition-colors",
+  presetButtonActive: "bg-theme-accent text-white",
+  presetButtonIdle: "bg-theme-bg text-theme-text-muted hover:bg-theme-accent/10",
+};
+
+export function PomodoroTimerCard({ onStateChange }: PomodoroTimerCardProps) {
   const { addPoints } = useTheme();
   const [focusMinutes, setFocusMinutes] = useState(25);
   const [shortBreakMinutes, setShortBreakMinutes] = useState(5);
   const [longBreakMinutes, setLongBreakMinutes] = useState(15);
-  const [phase, setPhase] = useState<Phase>("focus");
+  const [phase, setPhase] = useState<PomodoroPhase>("focus");
   const [remainingSeconds, setRemainingSeconds] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [completedFocusSessions, setCompletedFocusSessions] = useState(0);
@@ -104,6 +135,10 @@ export function PomodoroTimerCard() {
     return () => clearInterval(t);
   }, [isRunning, handleComplete]);
 
+  useEffect(() => {
+    onStateChange?.({ isRunning, phase });
+  }, [isRunning, phase, onStateChange]);
+
   const toggle = () => setIsRunning((r) => !r);
 
   const reset = () => {
@@ -121,27 +156,27 @@ export function PomodoroTimerCard() {
         : "var(--color-plane-1)";
 
   return (
-    <div className="flex flex-col items-center gap-8 pt-8">
+    <div className={styles.root}>
       {/* Ding sound element (generated programmatically) */}
       <audio ref={dingRef} preload="auto" src="/sounds/ding.mp3" />
 
       {/* Phase label */}
       <div
-        className="glass rounded-full px-6 py-2 shadow-glass"
+        className={styles.phaseBadge}
         style={{ borderColor: phaseColor, borderWidth: "1px" }}
       >
-        <span className="font-serif text-lg font-medium text-theme-text">
+        <span className={styles.phaseTitle}>
           {PHASE_LABELS[phase]}
         </span>
-        <span className="text-sm text-theme-text-muted ml-2">
+        <span className={styles.phaseSession}>
           Session {completedFocusSessions + 1}
         </span>
       </div>
 
       {/* Big timer */}
-      <div className="relative flex items-center justify-center">
+      <div className={styles.timerWrap}>
         {/* Ring */}
-        <svg className="w-64 h-64 sm:w-80 sm:h-80 -rotate-90" viewBox="0 0 200 200">
+        <svg className={styles.ringSvg} viewBox="0 0 200 200">
           <circle
             cx="100"
             cy="100"
@@ -161,42 +196,42 @@ export function PomodoroTimerCard() {
             strokeLinecap="round"
             strokeDasharray={`${2 * Math.PI * 90}`}
             strokeDashoffset={`${2 * Math.PI * 90 * (1 - progress / 100)}`}
-            className="transition-all duration-1000 ease-linear"
+            className={styles.ringProgress}
           />
         </svg>
-        <span className="absolute font-sans text-6xl sm:text-7xl tabular-nums font-light text-theme-text tracking-tight">
+        <span className={styles.timeDisplay}>
           {formatSeconds(remainingSeconds)}
         </span>
       </div>
 
       {/* Controls */}
-      <div className="flex gap-3">
+      <div className={styles.controlsRow}>
         <button
           onClick={toggle}
-          className="glass rounded-2xl px-8 py-3 shadow-glass font-serif text-lg font-medium text-theme-text hover:scale-[1.03] transition-transform"
+          className={styles.primaryButton}
         >
           {isRunning ? "Pause" : "Start"}
         </button>
         <button
           onClick={reset}
-          className="glass rounded-2xl px-6 py-3 shadow-glass font-serif text-lg text-theme-text-muted hover:scale-[1.03] transition-transform"
+          className={styles.resetButton}
         >
           Reset
         </button>
       </div>
 
       {/* Coin hint */}
-      <div className="flex items-center gap-2 text-theme-text-muted">
-        <svg className="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none">
+      <div className={styles.coinHint}>
+        <svg className={styles.coinIcon} viewBox="0 0 20 20" fill="none">
           <circle cx="10" cy="10" r="9" fill="var(--color-accent-yellow)" opacity="0.6" />
           <text x="10" y="14" textAnchor="middle" fontSize="10" fill="var(--color-text)" fontWeight="bold">$</text>
         </svg>
-        <span className="text-sm">Earn 2 coins per minute of focus time</span>
+        <span className={styles.coinText}>Earn 2 coins per minute of focus time</span>
       </div>
 
       {/* Presets (only when not running and on focus phase) */}
       {!isRunning && (
-        <div className="glass-card rounded-2xl p-4 space-y-3 w-full max-w-sm">
+        <div className={styles.presetsCard}>
           <PresetRow
             label="Focus"
             options={PRESETS.focus}
@@ -242,17 +277,15 @@ function PresetRow({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-theme-text-muted">{label}</span>
-      <div className="flex gap-1.5">
+    <div className={styles.presetRow}>
+      <span className={styles.presetLabel}>{label}</span>
+      <div className={styles.presetButtons}>
         {options.map((m) => (
           <button
             key={m}
             onClick={() => onChange(m)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              value === m
-                ? "bg-theme-accent text-white"
-                : "bg-theme-bg text-theme-text-muted hover:bg-theme-accent/10"
+            className={`${styles.presetButtonBase} ${
+              value === m ? styles.presetButtonActive : styles.presetButtonIdle
             }`}
           >
             {m}m

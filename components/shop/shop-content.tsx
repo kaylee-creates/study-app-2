@@ -3,26 +3,49 @@
 import { useTheme } from "@/components/theme-provider";
 import { THEMES } from "@/lib/themes";
 
+const styles = {
+  root: "space-y-6",
+  headerRow: "flex items-center justify-between",
+  titleWrap: "inline-block",
+  title: "font-serif text-page-title text-theme-text",
+  titleUnderline: "mt-0.5",
+  balancePill: "glass rounded-full px-4 py-1.5 shadow-glass",
+  balanceText: "text-small font-medium text-theme-text",
+  grid: "grid grid-cols-1 gap-4 sm:grid-cols-2",
+  themeCard: "glass-card space-y-3 rounded-2xl p-4 transition-all",
+  themeCardActive: "ring-2 ring-theme-accent",
+  swatches: "flex gap-1.5",
+  swatch: "h-8 w-8 rounded-lg shadow-sm",
+  themeName: "font-serif text-card-title font-medium text-theme-text",
+  themeCost: "text-small text-theme-text-muted",
+  activeBadge:
+    "rounded-xl bg-theme-accent/10 px-3 py-1.5 text-center text-small font-medium text-theme-accent",
+  applyButton:
+    "glass w-full rounded-xl px-4 py-2 text-small font-medium text-theme-text shadow-glass transition-transform hover:scale-[1.01]",
+  buyButton:
+    "glass w-full rounded-xl px-4 py-2 text-small font-medium text-theme-text shadow-glass transition-transform hover:scale-[1.01] disabled:opacity-40 disabled:hover:scale-100",
+};
+
 export function ShopContent() {
   const { settings, purchaseTheme, switchTheme } = useTheme();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="inline-block">
-          <h1 className="font-serif text-3xl text-theme-text">Theme Shop</h1>
-          <svg className="mt-0.5" width="130" height="8" viewBox="0 0 130 8" fill="none">
+    <div className={styles.root}>
+      <div className={styles.headerRow}>
+        <div className={styles.titleWrap}>
+          <h1 className={styles.title}>Theme Shop</h1>
+          <svg className={styles.titleUnderline} width="130" height="8" viewBox="0 0 130 8" fill="none">
             <path d="M2,4 C14,1 28,7 42,4 C56,1 70,7 84,4 C98,1 112,7 128,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
           </svg>
         </div>
-        <div className="glass rounded-full px-4 py-1.5 shadow-glass">
-          <span className="text-sm font-medium text-theme-text">
+        <div className={styles.balancePill}>
+          <span className={styles.balanceText}>
             {settings.totalPoints} coins
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className={styles.grid}>
         {THEMES.map((theme) => {
           const owned = settings.purchasedThemeIds.includes(theme.id);
           const active = settings.activeThemeId === theme.id;
@@ -31,16 +54,14 @@ export function ShopContent() {
           return (
             <div
               key={theme.id}
-              className={`glass-card rounded-2xl p-4 space-y-3 transition-all ${
-                active ? "ring-2 ring-theme-accent" : ""
-              }`}
+              className={`${styles.themeCard} ${active ? styles.themeCardActive : ""}`}
             >
               {/* Color swatches */}
-              <div className="flex gap-1.5">
+              <div className={styles.swatches}>
                 {theme.colors.map((color, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-lg shadow-sm"
+                    className={styles.swatch}
                     style={{ background: color }}
                   />
                 ))}
@@ -48,23 +69,23 @@ export function ShopContent() {
 
               {/* Theme name and cost */}
               <div>
-                <h3 className="font-serif text-lg font-medium text-theme-text">
+                <h3 className={styles.themeName}>
                   {theme.name}
                 </h3>
-                <p className="text-sm text-theme-text-muted">
+                <p className={styles.themeCost}>
                   {theme.cost === 0 ? "Free" : `${theme.cost} coins`}
                 </p>
               </div>
 
               {/* Action button */}
               {active ? (
-                <div className="text-sm font-medium text-theme-accent px-3 py-1.5 rounded-xl bg-theme-accent/10 text-center">
+                <div className={styles.activeBadge}>
                   Active
                 </div>
               ) : owned ? (
                 <button
                   onClick={() => switchTheme(theme.id)}
-                  className="w-full glass rounded-xl px-4 py-2 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.01] transition-transform"
+                  className={styles.applyButton}
                 >
                   Apply
                 </button>
@@ -75,7 +96,7 @@ export function ShopContent() {
                     if (success) await switchTheme(theme.id);
                   }}
                   disabled={!canAfford}
-                  className="w-full glass rounded-xl px-4 py-2 shadow-glass text-sm font-medium text-theme-text hover:scale-[1.01] transition-transform disabled:opacity-40 disabled:hover:scale-100"
+                  className={styles.buyButton}
                 >
                   {canAfford ? `Buy for ${theme.cost} coins` : `Need ${theme.cost - settings.totalPoints} more coins`}
                 </button>
