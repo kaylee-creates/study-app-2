@@ -8,13 +8,18 @@ import { extractText } from "@/lib/extract-text";
 import { CornellRenderer } from "@/components/study-guide/cornell-renderer";
 import { TreeRenderer } from "@/components/study-guide/tree-renderer";
 import { QuestionsRenderer } from "@/components/study-guide/questions-renderer";
-import type { HighlightColor, NotepadEntry, StudyGuide, StudyGuideFormat } from "@/lib/domain";
+import { DiagnosticQuiz } from "@/components/study-guide/diagnostic-quiz";
+import { StudyPlan } from "@/components/study-guide/study-plan";
+import type {
+  AiFlashcardSuggestion,
+  DiagnosticQuestion,
+  HighlightColor,
+  NotepadEntry,
+  StudyGuide,
+  TopicResult,
+} from "@/lib/domain";
 
-const FORMAT_OPTIONS: { value: StudyGuideFormat; label: string; desc: string }[] = [
-  { value: "tree", label: "Tree Model", desc: "Hierarchical topics & subtopics" },
-  { value: "cornell", label: "Cornell Method", desc: "Cues, notes & summary" },
-  { value: "questions", label: "Questions", desc: "Multiple choice quiz" },
-];
+type StudyMode = "input" | "diagnostic" | "results";
 
 const styles = {
   root: "space-y-6",
@@ -65,13 +70,6 @@ const styles = {
   textHint: "mb-2 text-small text-theme-text-muted",
   textarea: "w-full min-h-[200px] rounded-xl px-4 py-3 bg-theme-bg border border-theme-accent/20 text-body text-theme-text placeholder:text-theme-text-muted/50 focus:outline-none focus:border-theme-accent resize-y",
 
-  formatGrid: "grid grid-cols-3 gap-2",
-  formatButton: "glass-card rounded-xl p-3 text-center transition-all",
-  formatButtonActive: "border-theme-accent ring-1 ring-theme-accent/30 scale-[1.02]",
-  formatButtonIdle: "hover:border-theme-accent/50",
-  formatLabel: "block font-serif text-body font-medium text-theme-text",
-  formatDesc: "block mt-0.5 text-caption text-theme-text-muted",
-
   generateButton: "w-full glass rounded-2xl px-6 py-3 shadow-glass font-serif text-card-title font-medium text-theme-text hover:scale-[1.01] transition-transform disabled:opacity-50",
   coinRow: "flex items-center justify-center gap-2 text-theme-text-muted",
   coinText: "text-small",
@@ -87,8 +85,6 @@ const styles = {
     "prose-strong:text-theme-text prose-a:text-theme-accent",
   ].join(" "),
 
-  flashcardCard: "glass-card rounded-2xl p-4 space-y-3",
-  flashcardButton: "glass rounded-xl px-4 py-2 shadow-glass text-small font-medium text-theme-text hover:scale-[1.02] transition-transform disabled:opacity-50",
   errorText: "text-small text-red-500",
 };
 
@@ -112,19 +108,19 @@ const notepadMarkClassByColor: Record<HighlightColor, string> = {
 export function StudyGuideContent() {
   const router = useRouter();
   const { addPoints } = useTheme();
-  const [mode, setMode] = useState<"input" | "result">("input");
+  const [mode, setMode] = useState<StudyMode>("input");
   const [inputText, setInputText] = useState("");
-  const [format, setFormat] = useState<StudyGuideFormat>("tree");
-  const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [diagnosticError, setDiagnosticError] = useState("");
+  const [diagnosticQuestions, setDiagnosticQuestions] = useState<DiagnosticQuestion[]>([]);
+  const [diagnosticResults, setDiagnosticResults] = useState<TopicResult[]>([]);
+  const [weakTopics, setWeakTopics] = useState<string[]>([]);
   const [savedGuides, setSavedGuides] = useState<StudyGuide[]>([]);
   const [notepadEntries, setNotepadEntries] = useState<NotepadEntry[]>([]);
   const [selectedGuide, setSelectedGuide] = useState<StudyGuide | null>(null);
   const [showGuidePicker, setShowGuidePicker] = useState(false);
   const [showNotepad, setShowNotepad] = useState(false);
   const [notepadColorFilter, setNotepadColorFilter] = useState<HighlightColor | "all">("all");
-  const [flashcardsLoading, setFlashcardsLoading] = useState(false);
-  const [flashcardsError, setFlashcardsError] = useState("");
   const [fileError, setFileError] = useState("");
 
   const recentGuides = useMemo(() => [...savedGuides].slice(-2).reverse(), [savedGuides]);
@@ -166,93 +162,95 @@ export function StudyGuideContent() {
     [processFile]
   );
 
-  const generate = async () => {
+  const startDiagnostic = async () => {
     if (!inputText.trim()) return;
     setLoading(true);
+    setDiagnosticError("");
     try {
-      const res = await fetch("/api/ai/study-guide", {
+      const res = await fetch("/api/ai/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: inputText, format }),
+        body: JSON.stringify({ content: inputText }),
       });
       const data = await res.json();
-      if (res.ok && data.result) {
-        setResult(data.result);
-        setMode("result");
-
-        const guide: StudyGuide = {
-          id: generateId(),
-          title: inputText.slice(0, 50).trim() + (inputText.length > 50 ? "..." : ""),
-          format,
-          content: data.result,
-          rawSource: inputText,
-          createdAt: new Date().toISOString(),
-        };
-        const state = await localStudyRepository.loadStudyState();
-        await localStudyRepository.saveStudyState({
-          studyGuides: [...state.studyGuides, guide],
-        });
-        setSavedGuides((prev) => [...prev, guide]);
-        setSelectedGuide(guide);
-        await addPoints(15);
+      if (!res.ok || !Array.isArray(data.questions) || data.questions.length === 0) {
+        setDiagnosticError("Could not build a quiz from these notes. Please try again.");
+        return;
       }
+      setDiagnosticQuestions(data.questions);
+      setMode("diagnostic");
+    } catch {
+      setDiagnosticError("Failed to build a quiz. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const generateFlashcards = async () => {
-    const source = selectedGuide?.rawSource || inputText;
-    if (!source.trim()) return;
-    setFlashcardsLoading(true);
-    setFlashcardsError("");
-    try {
-      const res = await fetch("/api/ai/flashcards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: source, count: 5 }),
-      });
-      const data = await res.json();
-      if (!res.ok || !Array.isArray(data.cards) || data.cards.length === 0) {
-        setFlashcardsError("Could not generate flashcards. Please try again.");
-        return;
-      }
+  const handleQuizComplete = async (results: TopicResult[], weak: string[]) => {
+    setDiagnosticResults(results);
+    setWeakTopics(weak);
+
+    const guide: StudyGuide = {
+      id: generateId(),
+      title: inputText.slice(0, 50).trim() + (inputText.length > 50 ? "..." : ""),
+      format: "cornell",
+      content: "",
+      rawSource: inputText,
+      createdAt: new Date().toISOString(),
+      diagnostic: { questions: diagnosticQuestions, results, weakTopics: weak },
+    };
+    const state = await localStudyRepository.loadStudyState();
+    await localStudyRepository.saveStudyState({
+      studyGuides: [...state.studyGuides, guide],
+    });
+    setSavedGuides((prev) => [...prev, guide]);
+    setSelectedGuide(guide);
+    setMode("results");
+    await addPoints(15);
+  };
+
+  const saveFlashcards = useCallback(
+    async (cards: AiFlashcardSuggestion[]) => {
       const state = await localStudyRepository.loadStudyState();
-      const newCards = data.cards.map(
-        (c: { question: string; answer: string }) => ({
-          id: generateId(),
-          noteId: null,
-          trackId: null,
-          question: c.question,
-          answer: c.answer,
-          createdAt: new Date().toISOString(),
-          lastReviewedAt: null,
-          easeScore: 1,
-        })
-      );
+      const newCards = cards.map((card) => ({
+        id: generateId(),
+        noteId: null,
+        trackId: null,
+        question: card.question,
+        answer: card.answer,
+        createdAt: new Date().toISOString(),
+        lastReviewedAt: null,
+        easeScore: 1,
+      }));
       await localStudyRepository.saveStudyState({
         flashcards: [...state.flashcards, ...newCards],
       });
       router.push("/flashcards");
-    } catch {
-      setFlashcardsError("Failed to generate flashcards. Please try again.");
-    } finally {
-      setFlashcardsLoading(false);
-    }
-  };
+    },
+    [router]
+  );
 
   const viewGuide = (guide: StudyGuide) => {
     setSelectedGuide(guide);
-    setResult(guide.content);
-    setMode("result");
     setShowGuidePicker(false);
+    if (guide.diagnostic) {
+      setInputText(guide.rawSource);
+      setDiagnosticQuestions(guide.diagnostic.questions);
+      setDiagnosticResults(guide.diagnostic.results);
+      setWeakTopics(guide.diagnostic.weakTopics);
+      setMode("results");
+    } else {
+      setMode("results");
+    }
   };
 
   const backToInput = () => {
     setMode("input");
     setSelectedGuide(null);
-    setResult("");
-    setFlashcardsError("");
+    setDiagnosticQuestions([]);
+    setDiagnosticResults([]);
+    setWeakTopics([]);
+    setDiagnosticError("");
   };
 
   const updateSelectedGuide = useCallback(
@@ -322,16 +320,13 @@ export function StudyGuideContent() {
         <div className={styles.loadingOverlay}>
           <div className={styles.loadingCard}>
             <div className={styles.loadingSpinner} />
-            <p className={styles.loadingText}>Generating your study guide...</p>
+            <p className={styles.loadingText}>Building your diagnostic quiz...</p>
           </div>
         </div>
       )}
 
       <div className={styles.titleBlock}>
         <h1 className={styles.title}>Study Guide</h1>
-        <svg className="mt-0.5" width="120" height="8" viewBox="0 0 120 8" fill="none">
-          <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 108,4 C112,3 116,4 118,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-        </svg>
       </div>
 
       {savedGuides.length > 0 && (
@@ -432,42 +427,41 @@ export function StudyGuideContent() {
             />
           </div>
 
-          <div className={styles.formatGrid}>
-            {FORMAT_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setFormat(opt.value)}
-                className={`${styles.formatButton} ${
-                  format === opt.value
-                    ? styles.formatButtonActive
-                    : styles.formatButtonIdle
-                }`}
-              >
-                <span className={styles.formatLabel}>{opt.label}</span>
-                <span className={styles.formatDesc}>{opt.desc}</span>
-              </button>
-            ))}
-          </div>
-
           <button
-            onClick={generate}
+            onClick={startDiagnostic}
             disabled={loading || !inputText.trim()}
             className={styles.generateButton}
           >
-            {loading ? "Generating..." : "Generate Study Guide"}
+            {loading ? "Building quiz..." : "Start Diagnostic Quiz"}
           </button>
+
+          {diagnosticError && <p className={styles.errorText}>{diagnosticError}</p>}
 
           <div className={styles.coinRow}>
             <svg className="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="9" fill="var(--color-accent-yellow)" opacity="0.6" />
               <text x="10" y="14" textAnchor="middle" fontSize="10" fill="var(--color-text)" fontWeight="bold">$</text>
             </svg>
-            <span className={styles.coinText}>Earn 15 coins for each study guide you create</span>
+            <span className={styles.coinText}>Earn 15 coins for each study plan you complete</span>
           </div>
         </div>
       )}
 
-      {mode === "result" && (
+      {mode === "diagnostic" && (
+        <div className={styles.resultSection}>
+          <div className={styles.resultTopRow}>
+            <button onClick={backToInput} className={styles.backButton}>
+              &larr; Back to input
+            </button>
+          </div>
+          <p className={styles.textHint}>
+            Answer these questions so we can find what to focus on, then build your plan.
+          </p>
+          <DiagnosticQuiz questions={diagnosticQuestions} onComplete={handleQuizComplete} />
+        </div>
+      )}
+
+      {mode === "results" && (
         <div className={styles.resultSection}>
           <div className={styles.resultTopRow}>
             <button onClick={backToInput} className={styles.backButton}>
@@ -478,46 +472,27 @@ export function StudyGuideContent() {
             </button>
           </div>
 
-          {(selectedGuide?.format ?? format) === "cornell" ? (
-            <CornellRenderer
+          {selectedGuide?.diagnostic || diagnosticResults.length > 0 ? (
+            <StudyPlan
               guideId={selectedGuide?.id}
-              guideTitle={selectedGuide?.title ?? inputText.slice(0, 50).trim()}
               title={selectedGuide?.title ?? inputText.slice(0, 50).trim()}
               date={selectedGuide?.createdAt ?? new Date().toISOString()}
-              content={result}
+              rawSource={selectedGuide?.rawSource ?? inputText}
+              results={diagnosticResults}
+              weakTopics={weakTopics}
               notepadEntries={notepadEntries}
-              onCreateNotepadEntry={createNotepadEntry}
-              onSave={async (newContent) => {
-                setResult(newContent);
+              cornellContent={selectedGuide?.content || undefined}
+              onCornellContentChange={(content) => {
                 if (selectedGuide) {
-                  await updateSelectedGuide((guide) => ({ ...guide, content: newContent }));
+                  void updateSelectedGuide((guide) => ({ ...guide, content }));
                 }
               }}
+              onCreateNotepadEntry={createNotepadEntry}
+              onSaveFlashcards={saveFlashcards}
             />
-          ) : (selectedGuide?.format ?? format) === "tree" ? (
-            <div className={styles.resultCard}>
-              <TreeRenderer content={result} />
-            </div>
-          ) : (selectedGuide?.format ?? format) === "questions" ? (
-            <QuestionsRenderer content={result} />
           ) : (
-            <div className={styles.resultCard}>
-              <div className={styles.proseWrapper}>
-                <MarkdownRenderer content={result} />
-              </div>
-            </div>
+            <LegacyGuideView guide={selectedGuide} />
           )}
-
-          <div className={styles.flashcardCard}>
-            <button
-              onClick={generateFlashcards}
-              disabled={flashcardsLoading}
-              className={styles.flashcardButton}
-            >
-              {flashcardsLoading ? "Generating & saving..." : "Generate Flashcards"}
-            </button>
-            {flashcardsError && <p className={styles.errorText}>{flashcardsError}</p>}
-          </div>
         </div>
       )}
 
@@ -610,14 +585,44 @@ function NotepadEntryCard({
         <button
           type="button"
           className={styles.notepadDelete}
-          onClick={() => {
-            if (window.confirm("Delete this saved note?")) {
-              void onDelete(entry.id);
-            }
-          }}
+          onClick={() => void onDelete(entry.id)}
         >
           Delete note
         </button>
+      </div>
+    </div>
+  );
+}
+
+function LegacyGuideView({ guide }: { guide: StudyGuide | null }) {
+  if (!guide) return null;
+  if (guide.format === "cornell") {
+    return (
+      <CornellRenderer
+        guideId={guide.id}
+        guideTitle={guide.title}
+        title={guide.title}
+        date={guide.createdAt}
+        content={guide.content}
+        notepadEntries={[]}
+        onSave={() => {}}
+      />
+    );
+  }
+  if (guide.format === "questions") {
+    return <QuestionsRenderer content={guide.content} />;
+  }
+  if (guide.format === "tree") {
+    return (
+      <div className={styles.resultCard}>
+        <TreeRenderer content={guide.content} />
+      </div>
+    );
+  }
+  return (
+    <div className={styles.resultCard}>
+      <div className={styles.proseWrapper}>
+        <MarkdownRenderer content={guide.content} />
       </div>
     </div>
   );

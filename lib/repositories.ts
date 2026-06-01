@@ -5,7 +5,6 @@ import type {
   Flashcard,
   PomodoroSession,
   PlanItem,
-  ScrapbookItem,
   PomodoroSettings,
   StudyGuide,
   UserSettings,
@@ -19,9 +18,7 @@ export interface StudyRepository {
   getFlashcards(): Promise<Flashcard[]>;
   getPomodoroSessions(): Promise<PomodoroSession[]>;
   getPlanItems(): Promise<PlanItem[]>;
-  getScrapbookItems(pageId: string): Promise<ScrapbookItem[]>;
   getPomodoroSettings(): Promise<PomodoroSettings>;
   getStudyGuides(): Promise<StudyGuide[]>;
   getUserSettings(): Promise<UserSettings>;
-  saveScrapbookItems(pageId: string, items: ScrapbookItem[]): Promise<void>;
 }

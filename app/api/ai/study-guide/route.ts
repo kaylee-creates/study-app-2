@@ -6,6 +6,7 @@ export const maxDuration = 60;
 interface StudyGuideRequest {
   content: string;
   format: "tree" | "cornell" | "questions";
+  focusTopics?: string[];
 }
 
 export async function POST(request: Request) {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { content, format } = body;
+  const { content, format, focusTopics = [] } = body;
   if (!content || typeof content !== "string") {
     return NextResponse.json(
       { error: "content (string) required" },
@@ -30,9 +31,13 @@ export async function POST(request: Request) {
     );
   }
 
+  const safeFocusTopics = Array.isArray(focusTopics)
+    ? focusTopics.filter((topic): topic is string => typeof topic === "string")
+    : [];
+
   if (getGeminiKey()) {
     try {
-      const { prompt, system } = buildPrompt(content, format);
+      const { prompt, system } = buildPrompt(content, format, safeFocusTopics);
       const result = await callGemini(prompt, 8192, system);
       return NextResponse.json({ result });
     } catch (e) {
@@ -58,23 +63,36 @@ function sanitizeContent(text: string): string {
     .trim();
 }
 
-function buildPrompt(content: string, format: string): { prompt: string; system?: string } {
+function buildFocusInstruction(focusTopics: string[]): string {
+  if (focusTopics.length === 0) return "";
+  return `The student struggled with these topics on a diagnostic quiz: ${focusTopics.join(
+    ", "
+  )}. Give these topics extra depth, clearer explanations, more examples, and more practice than the rest of the material.`;
+}
+
+function buildPrompt(
+  content: string,
+  format: string,
+  focusTopics: string[]
+): { prompt: string; system?: string } {
   const truncated = sanitizeContent(content).slice(0, 12000);
+  const focusInstruction = buildFocusInstruction(focusTopics);
+  const focusPrefix = focusInstruction ? `${focusInstruction}\n\n` : "";
   switch (format) {
     case "tree":
       return {
-        prompt: `Convert the following text into a structured tree model study guide. Use hierarchical headings (# for main topics, ## for subtopics, ### for details). Group related concepts together. Return only the formatted content in Markdown.\n\n${truncated}`,
+        prompt: `${focusPrefix}Convert the following text into a structured tree model study guide. Use hierarchical headings (# for main topics, ## for subtopics, ### for details). Group related concepts together. Return only the formatted content in Markdown.\n\n${truncated}`,
       };
     case "cornell":
       return {
         system: `You are a study notes formatter. You MUST output EXACTLY four markdown sections with these EXACT headings: ## Keywords, ## Questions, ## Notes, ## Summary. Do NOT use any other ## headings. Do NOT add a title. Start your response with ## Keywords on the very first line.`,
-        prompt: `Here is the source text to convert into Cornell notes:\n\n${truncated}\n\n---\n\nNow format the above text as Cornell method study notes using EXACTLY these four sections. Start with ## Keywords on the first line.\n\n## Keywords\nExtract domain-specific vocabulary — technical terms, concepts, names, jargon. Group by theme using ### subheadings. Each term bold with a short definition:\n### Theme Name\n- **Term** -- definition\n\n## Questions\n5-8 specific factual comprehension questions as bullet points.\n\n## Notes\nOrganize the most important information by conceptual theme. Distill and synthesize — do NOT list every sentence. Use ### subheadings, numbered main points, and indented bullet sub-details. Limit each theme to 1-2 main points with 2-3 details.\n\n## Summary\n2-3 sentence summary of key takeaways.`,
+        prompt: `${focusPrefix}Here is the source text to convert into Cornell notes:\n\n${truncated}\n\n---\n\nNow format the above text as Cornell method study notes using EXACTLY these four sections. Start with ## Keywords on the first line.\n\n## Keywords\nExtract domain-specific vocabulary — technical terms, concepts, names, jargon. Group by theme using ### subheadings. Each term bold with a short definition:\n### Theme Name\n- **Term** -- definition\n\n## Questions\n5-8 specific factual comprehension questions as bullet points.\n\n## Notes\nOrganize the most important information by conceptual theme. Distill and synthesize — do NOT list every sentence. Use ### subheadings, numbered main points, and indented bullet sub-details. Limit each theme to 1-2 main points with 2-3 details.\n\n## Summary\n2-3 sentence summary of key takeaways.`,
       };
     case "questions":
       return {
         system:
           "You are a quiz generator. Return valid JSON only, with no markdown and no extra text.",
-        prompt: `Create 8 multiple-choice questions from the source text below.
+        prompt: `${focusPrefix}Create 8 multiple-choice questions from the source text below.
 
 Return ONLY a JSON array. Each item must have this exact shape:
 {"question":"string","options":["opt1","opt2","opt3","opt4"],"correctIndex":0,"explanation":"string"}

@@ -27,8 +27,8 @@ const italianno = Italianno({
 });
 
 export const metadata: Metadata = {
-  title: "Kaylee — Study & Whiteboard",
-  description: "Pomodoro, flashcards, AI summaries, and a cozy digital whiteboard.",
+  title: "Kaylee — Study",
+  description: "Pomodoro, flashcards, AI study guides, and a smart calendar planner.",
 };
 
 export default function RootLayout({

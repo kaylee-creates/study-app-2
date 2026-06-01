@@ -46,7 +46,6 @@ const styles = {
   header: "flex items-center justify-between",
   titleWrap: "inline-block",
   pageTitle: "font-serif text-page-title text-theme-text",
-  titleUnderline: "mt-0.5",
   addEventHeaderButton:
     "glass rounded-xl px-4 py-2 shadow-glass text-small font-medium text-theme-text hover:scale-[1.02] transition-transform",
   monthNav: "flex items-center justify-between glass-card rounded-2xl p-3",
@@ -104,6 +103,7 @@ const styles = {
     "px-4 py-2.5 rounded-xl text-small text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-colors",
   modalCancelButton:
     "px-4 py-2.5 rounded-xl text-small text-theme-text-muted hover:bg-theme-accent/5 transition-colors",
+
 };
 
 export function PlannerContent() {
@@ -153,6 +153,7 @@ export function PlannerContent() {
     setForm(emptyForm(date));
     setModalOpen(true);
   };
+
 
   const openEditEvent = (item: PlanItem) => {
     setEditingId(item.id);
@@ -224,9 +225,6 @@ export function PlannerContent() {
       <div className={styles.header}>
         <div className={styles.titleWrap}>
           <h1 className={styles.pageTitle}>Calendar</h1>
-          <svg className={styles.titleUnderline} width="100" height="8" viewBox="0 0 100 8" fill="none">
-            <path d="M2,4 C12,1 24,7 36,4 C48,1 60,7 72,4 C84,1 96,7 98,4" stroke="var(--color-accent-yellow)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-          </svg>
         </div>
         <button
           onClick={() => openAddEvent()}

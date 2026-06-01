@@ -1,7 +1,6 @@
 import type {
   StudyState,
   PomodoroSettings,
-  ScrapbookItem,
   UserSettings,
 } from "./domain";
 import type { StudyRepository } from "./repositories";
@@ -31,7 +30,8 @@ function getStoredState(): StudyState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return getDefaultState();
-    const parsed = JSON.parse(raw) as Partial<StudyState>;
+    // Cast to a loose shape to safely ignore removed fields like scrapbookItems
+    const parsed = JSON.parse(raw) as Partial<StudyState> & { scrapbookItems?: unknown };
     return mergeWithDefaults(parsed);
   } catch {
     return getDefaultState();
@@ -45,7 +45,6 @@ function getDefaultState(): StudyState {
     flashcards: [],
     pomodoroSessions: [],
     planItems: [],
-    scrapbookItems: [],
     pomodoroSettings: defaultSettings,
     studyGuides: [],
     notepadEntries: [],
@@ -60,7 +59,6 @@ function mergeWithDefaults(partial: Partial<StudyState>): StudyState {
     flashcards: partial.flashcards ?? [],
     pomodoroSessions: partial.pomodoroSessions ?? [],
     planItems: partial.planItems ?? [],
-    scrapbookItems: partial.scrapbookItems ?? [],
     pomodoroSettings: partial.pomodoroSettings ?? defaultSettings,
     studyGuides: partial.studyGuides ?? [],
     notepadEntries: partial.notepadEntries ?? [],
@@ -97,7 +95,6 @@ export const localStudyRepository: StudyRepository = {
       flashcards: partial.flashcards ?? current.flashcards,
       pomodoroSessions: partial.pomodoroSessions ?? current.pomodoroSessions,
       planItems: partial.planItems ?? current.planItems,
-      scrapbookItems: partial.scrapbookItems ?? current.scrapbookItems,
       pomodoroSettings: partial.pomodoroSettings ?? current.pomodoroSettings,
       studyGuides: partial.studyGuides ?? current.studyGuides,
       notepadEntries: partial.notepadEntries ?? current.notepadEntries,
@@ -128,11 +125,6 @@ export const localStudyRepository: StudyRepository = {
     return getStoredState().planItems;
   },
 
-  async getScrapbookItems(pageId: string) {
-    const items = getStoredState().scrapbookItems;
-    return items.filter((i) => i.pageId === pageId);
-  },
-
   async getPomodoroSettings() {
     const s = getStoredState().pomodoroSettings;
     return { ...defaultSettings, ...s };
@@ -144,14 +136,5 @@ export const localStudyRepository: StudyRepository = {
 
   async getUserSettings() {
     return getStoredState().userSettings;
-  },
-
-  async saveScrapbookItems(pageId: string, items: ScrapbookItem[]) {
-    const state = getStoredState();
-    const otherItems = state.scrapbookItems.filter((i) => i.pageId !== pageId);
-    persist({
-      ...state,
-      scrapbookItems: [...otherItems, ...items],
-    });
   },
 };

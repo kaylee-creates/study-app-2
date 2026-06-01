@@ -63,29 +63,6 @@ export interface PomodoroSettings {
   pointsPerFocusMinute: number;
 }
 
-export interface ScrapbookItem {
-  id: string;
-  pageId: string;
-  type: "image" | "widget" | "stroke" | "text" | "shape";
-  imageUrl?: string;
-  imageName?: string;
-  textContent?: string;
-  color?: string;
-  fillColor?: string;
-  strokeWidth?: number;
-  fontSize?: number;
-  shapeKind?: "rectangle" | "ellipse" | "line" | "arrow";
-  points?: { x: number; y: number }[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  zIndex: number;
-  rotation?: number;
-  relatedEntityId?: string;
-  createdAt: string;
-}
-
 export type StudyGuideFormat = "tree" | "cornell" | "questions";
 
 export interface StudyGuideAnnotation {
@@ -107,6 +84,34 @@ export interface NotepadEntry {
   createdAt: string;
 }
 
+export interface DiagnosticQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+  topic: string;
+}
+
+export interface TopicResult {
+  topic: string;
+  correct: number;
+  total: number;
+}
+
+export type MemoryTechnique = "acronym" | "rhyme" | "mnemonic" | "chunking";
+
+export interface MemoryTip {
+  topic: string;
+  technique: MemoryTechnique;
+  tip: string;
+}
+
+export interface DiagnosticPlan {
+  questions: DiagnosticQuestion[];
+  results: TopicResult[];
+  weakTopics: string[];
+}
+
 export interface StudyGuide {
   id: string;
   title: string;
@@ -115,6 +120,7 @@ export interface StudyGuide {
   rawSource: string;
   createdAt: string;
   annotations?: StudyGuideAnnotation[];
+  diagnostic?: DiagnosticPlan;
 }
 
 export interface UserSettings {
@@ -132,7 +138,6 @@ export interface StudyState {
   flashcards: Flashcard[];
   pomodoroSessions: PomodoroSession[];
   planItems: PlanItem[];
-  scrapbookItems: ScrapbookItem[];
   pomodoroSettings: PomodoroSettings;
   studyGuides: StudyGuide[];
   notepadEntries: NotepadEntry[];

@@ -45,7 +45,7 @@ const styles = {
   cornellTop: "grid md:grid-cols-[minmax(0,30%)_minmax(0,70%)] md:max-h-[58vh]",
   cornellCueColumn:
     "border-b border-theme-accent/35 p-4 md:h-[58vh] md:overflow-y-auto md:border-b-0 md:border-r themed-scrollbar",
-  cornellNotesColumn: "relative p-4",
+  cornellNotesColumn: "relative p-4 md:h-[58vh] md:overflow-y-auto themed-scrollbar",
   cornellSummaryRow: "border-t-2 border-theme-accent/35 p-4",
   cornellTitle: "font-serif text-section-title font-bold text-theme-accent",
   cornellSubTitle: "mt-4 mb-2 font-serif text-card-title font-semibold text-theme-accent",
